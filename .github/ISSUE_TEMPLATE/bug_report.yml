@@ -1,0 +1,31 @@
+name: Bug report
+description: Something in whatcategory doesn't work the way it should (not a wrong suggestion).
+labels: [bug]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you did
+      description: The smallest code that shows it.
+      render: js
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: whatcategory version
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Where it runs
+      description: Node version, or browser and bundler (Vite, webpack, esbuild…).
+    validations:
+      required: true

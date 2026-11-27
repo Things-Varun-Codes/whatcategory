@@ -1,32 +1,44 @@
 name: CI
+
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
+  # The release workflow runs the same checks before it publishes, and the data refresh starts
+  # this by hand, because pull requests opened by a workflow don't trigger CI on their own.
+  workflow_call:
+  workflow_dispatch:
+
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run build:data
       - run: npm run build
       - run: npm test
       - run: npm run eval
-      - name: Evaluation results are committed
-        run: git diff --exit-code eval/ THIRD_PARTY_NOTICES.md || (echo "::error::Run 'npm run eval' and commit eval/RESULTS.md and eval/results.json" && exit 1)
-      - name: Package contents
-        run: npm pack --dry-run 2>&1 | tail -8
+      - name: Evaluation results and notices are committed
+        run: git diff --exit-code eval/ THIRD_PARTY_NOTICES.md || (echo "::error::Run 'npm run build:data && npm run eval' and commit eval/ and THIRD_PARTY_NOTICES.md" && exit 1)
       # The library (not the data build) supports older Node versions.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 18
+          node-version: '18'
       - name: Runs on Node 18
         run: |
           node --input-type=module -e "

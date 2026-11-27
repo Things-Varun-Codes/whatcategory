@@ -1,0 +1,19 @@
+# Changelog
+
+All notable changes to this project are listed here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
+[Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+## [0.1.0]
+
+### Added
+
+- `createClassifier`: suggests one of the app's categories for a short title in any language, with a
+  confidence and the reasons, or `null` when unsure.
+- History learning: exact repeats win, most recent first; similar past titles count when the data is unsure.
+- `createEmojiFinder`: emoji for free text, without categories.
+- `loadData`: lazy per-locale and per-country data chunks, with locale fallback.
+- Data for 161 locales and 257 regions from Unicode CLDR 49, the iD tagging schema and the
+  OpenStreetMap name-suggestion-index.

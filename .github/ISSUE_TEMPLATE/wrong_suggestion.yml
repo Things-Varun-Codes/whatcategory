@@ -1,0 +1,45 @@
+name: Wrong or missing suggestion
+description: A title got the wrong category, or none when the answer was obvious.
+labels: [suggestion quality]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These reports are the most useful kind: each one can become a case in the evaluation set (`eval/sets/`).
+        Fixes have to come from the open data or a general rule, never a hand-written word list, so some cases end up as known limitations.
+        `node eval/explain.ts "<title>" --lang <locale> --region <country>` shows why a title scored the way it did.
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      placeholder: Stromrechnung
+    validations:
+      required: true
+  - type: input
+    id: locales
+    attributes:
+      label: Locales and regions you loaded
+      placeholder: "locales: ['de', 'en'], regions: ['DE']"
+    validations:
+      required: true
+  - type: textarea
+    id: categories
+    attributes:
+      label: Your categories
+      description: The `categories` you pass, or the relevant ones.
+      render: js
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What you expected, and what you got
+      description: Include `why` from the result if there was one.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: whatcategory version
+    validations:
+      required: true

@@ -38,6 +38,7 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "CHANGELOG.md",
     "dist",
     "data",
     "types",
@@ -62,5 +63,11 @@
     "name-suggestion-index": "9.0.20261121",
     "typescript": "7.0.2",
     "vitest": "5.1.2"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=22.18"
+    }
   }
 }

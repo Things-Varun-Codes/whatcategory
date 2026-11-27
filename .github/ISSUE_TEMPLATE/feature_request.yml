@@ -1,0 +1,25 @@
+name: Feature request
+description: Something whatcategory should do, or do differently.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        whatcategory stays generic (no built-in categories or app domain), offline, and free of hand-written word lists. If the idea is still loose, a thread in Discussions is a better place to shape it.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to be able to do?
+      description: Describe your app and the situation, not just the feature.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How you imagine it working
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Would you build it?
+      options:
+        - label: I'd like to open a pull request for this

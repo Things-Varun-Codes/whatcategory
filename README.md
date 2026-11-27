@@ -155,6 +155,11 @@ node eval/explain.ts "Stromrechnung" --lang de --region DE   # see why a title s
 The data build needs Node 22.18+ (it runs TypeScript directly). The published library runs on Node 18+ and modern browsers.
 Upstream data is pinned in `package-lock.json` and in `upstream/emoji-test.txt`, and rebuilds are byte-for-byte deterministic. A weekly workflow refreshes the data and opens a pull request showing how the results changed.
 
+## Contributing
+
+Wrong suggestions, new evaluation cases (especially from native speakers) and fixes are welcome. See
+[CONTRIBUTING.md](CONTRIBUTING.md): the main rule is no hand-written word lists.
+
 ## Licence
 
 Code: MIT. Bundled data: Unicode License v3 (CLDR, emoji-test), ISC (iD tagging schema) and BSD-3-Clause (name-suggestion-index). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

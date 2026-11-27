@@ -1,0 +1,39 @@
+# Weekly for npm, monthly for actions, which change less often. Minor and patch
+# updates arrive as one pull request per ecosystem; a major version gets its own.
+# Security updates ignore the schedule and the cooldown.
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+    # The upstream data changes the evaluation results, so the weekly data refresh
+    # workflow updates these, rebuilds and shows the new numbers.
+    ignore:
+      - dependency-name: 'name-suggestion-index'
+      - dependency-name: '@openstreetmap/id-tagging-schema'
+      - dependency-name: 'cldr-annotations-full'
+      - dependency-name: 'cldr-core'
+    # A release has to be a week old first: most bad or hijacked ones are pulled by then.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      minor-and-patch:
+        update-types: ['minor', 'patch']
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    open-pull-requests-limit: 5
+    # A release has to be a week old first: most bad or hijacked ones are pulled by then.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      minor-and-patch:
+        update-types: ['minor', 'patch']

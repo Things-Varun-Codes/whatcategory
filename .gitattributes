@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+*.md diff=markdown
+# Generated, so review the evaluation results instead.
+package-lock.json linguist-generated
+eval/results.json linguist-generated
+upstream/** linguist-vendored
