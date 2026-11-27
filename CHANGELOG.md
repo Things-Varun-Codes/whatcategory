@@ -6,6 +6,8 @@ All notable changes to this project are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2]
+
 ### Fixed
 
 - A brand name that is also a word inside a longer title counts as both: "Flight to Delhi" now suggests
