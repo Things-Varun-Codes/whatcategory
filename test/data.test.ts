@@ -33,3 +33,24 @@ describe('generated data', () => {
     expect(find('Gitarre')[0].emoji).toBe('🎸')
   })
 })
+
+describe('README example', () => {
+  it('behaves as documented', async () => {
+    const { learn } = await import('../src/index.ts')
+    const classifier = createClassifier({
+      categories: [
+        { id: 'food', emoji: '🍽️', words: ['Eating out'] },
+        { id: 'groceries', emoji: '🛒', words: ['Groceries'] },
+        { id: 'transport', emoji: '🚕', words: ['Transport'] },
+        { id: 'bills', words: ['Bills', 'Rechnungen'] },
+      ],
+      data: await loadData({ locales: ['de', 'en'], regions: ['DE'] }),
+    })
+    expect(classifier.suggest('Abendessen')).toMatchObject({ id: 'food', why: [{ layer: 'words', text: 'abendessen', match: '🍴' }] })
+    expect(classifier.suggest('Lidl')?.id).toBe('groceries')
+    expect(classifier.suggest('Stromrechnung')?.id).toBe('bills')
+    expect(classifier.suggest('Sonstiges')).toBeNull()
+    const history = learn([], 'Bäckerei Müller', 'food')
+    expect(classifier.suggest('Bäckerei Müller', history)).toMatchObject({ id: 'food', confidence: 1 })
+  })
+})

@@ -1,0 +1,36 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:data
+      - run: npm run build
+      - run: npm test
+      - run: npm run eval
+      - name: Evaluation results are committed
+        run: git diff --exit-code eval/ THIRD_PARTY_NOTICES.md || (echo "::error::Run 'npm run eval' and commit eval/RESULTS.md and eval/results.json" && exit 1)
+      - name: Package contents
+        run: npm pack --dry-run 2>&1 | tail -8
+      # The library (not the data build) supports older Node versions.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Runs on Node 18
+        run: |
+          node --input-type=module -e "
+            const m = await import('./dist/index.js')
+            const c = m.createClassifier({ categories: [{ id: 'h', emoji: '💊' }], data: await m.loadData({ locales: ['de'] }) })
+            if (c.suggest('Apotheke')?.id !== 'h') process.exit(1)
+          "

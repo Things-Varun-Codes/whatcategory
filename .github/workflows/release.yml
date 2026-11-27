@@ -1,0 +1,25 @@
+# Publishes to npm when a GitHub release is published. Uses npm trusted publishing (OIDC): no token is stored.
+# One-time setup on npmjs.com: package settings → Trusted publisher → GitHub Actions, this repo, release.yml.
+name: Release
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run build:data
+      - run: npm run build
+      - run: npm test
+      # prepack rebuilds data and dist from the same pinned inputs, so the tested and published files match.
+      - run: npm publish --access public

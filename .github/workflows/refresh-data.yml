@@ -1,0 +1,41 @@
+# Weekly: update the upstream open data, rebuild, and open a pull request showing how the results changed.
+name: Refresh data
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Update upstream data
+        run: |
+          npm install --save-exact --save-dev name-suggestion-index@latest @openstreetmap/id-tagging-schema@latest cldr-annotations-full@latest cldr-core@latest
+          curl -fsSL https://unicode.org/Public/emoji/latest/emoji-test.txt -o upstream/emoji-test.txt
+      - run: npm run build:data
+      - run: npm run build
+      # Pull requests opened with GITHUB_TOKEN don't trigger CI, so test here.
+      - run: npm test
+      - run: npm run eval
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then echo "No upstream changes."; exit 0; fi
+          branch="data-refresh/$(date -u +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git commit -am "Refresh upstream data"
+          git push -u origin "$branch"
+          { echo "Automated upstream data refresh. Tests passed."; echo; echo '```diff'; git diff HEAD~1 -- eval/RESULTS.md | head -150; echo '```'; } > body.md
+          gh pr create --title "Refresh upstream data $(date -u +%Y-%m-%d)" --body-file body.md
