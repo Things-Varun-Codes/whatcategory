@@ -34,6 +34,34 @@ describe('generated data', () => {
   })
 })
 
+describe('reported wrong suggestions', () => {
+  // A typical expense app's categories, loaded for an Indian English user.
+  const expenses = [
+    { id: 'eating-out', emoji: '🍽️', words: ['Eating out'] },
+    { id: 'groceries', emoji: '🛒', words: ['Groceries'] },
+    { id: 'stays', emoji: '🛏️', words: ['Stays'] },
+    { id: 'flights', emoji: '✈️', words: ['Flights'] },
+    { id: 'taxis', emoji: '🚕', words: ['Taxis'] },
+    { id: 'fuel', emoji: '⛽', words: ['Fuel'] },
+    { id: 'medicine', emoji: '💊', words: ['Medicine'] },
+    { id: 'shopping', emoji: '🛍️', words: ['Shopping'] },
+  ]
+  it('reads words and brands without false links', async () => {
+    const c = createClassifier({ categories: expenses, data: await loadData({ locales: ['en'], regions: ['IN'] }) })
+    // Cafés are not taxis: the teahouse's "yellow tea" no longer links them to 🚕 "yellow".
+    expect(c.rank('Coffee')[0]?.id).not.toBe('taxis')
+    expect(c.rank('Chai')[0]?.id).not.toBe('taxis')
+    // ✈️ "plane" is not "plants"; "vegetables" also means "vegetable".
+    expect(c.rank('Vegetables')[0]?.id).toBe('groceries')
+    // "Flight" is a brand, but in a longer title it is also the word.
+    expect(c.suggest('Flight to Delhi')?.id).toBe('flights')
+    // Brands still count, alone and in a longer title.
+    expect(c.suggest('Subway')?.id).toBe('eating-out')
+    expect(c.suggest('Shell petrol')?.id).toBe('fuel')
+    expect(c.suggest('Groceries')?.id).toBe('groceries')
+  })
+})
+
 describe('README example', () => {
   it('behaves as documented', async () => {
     const { learn } = await import('../src/index.ts')

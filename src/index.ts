@@ -1,6 +1,6 @@
 import type { Chunk, BrandsChunk } from './data.ts'
 import { tokens, nameKey, emojiKey, wordMatch, fold } from './text.ts'
-import { prepareLocale, tokenEvidence, inflections, entryWeight, type Locale } from './words.ts'
+import { prepareLocale, tokenEvidence, inflections, entryWeight, isNumberForm, type Locale } from './words.ts'
 
 export type { Chunk, WordsChunk, BrandsChunk } from './data.ts'
 export { tokens, fold } from './text.ts'
@@ -104,8 +104,11 @@ export function createClassifier(options: Options): Classifier {
     const put = (w: string, s: number) => described.set(w, Math.max(described.get(w) ?? 0, s))
     for (const w of words) put(w, 1)
     for (const [c, s] of anchors) for (const loc of locales) for (const [w, bw] of loc.bags.get(c) ?? []) put(w, s * bw)
-    // Inflected forms count too ("grocery" describes a category called "Groceries").
-    for (const [w, s] of [...described]) for (const loc of locales) for (const [k, q] of inflections(w, loc)) put(k, s * q)
+    // Inflected forms count too ("grocery" describes a category called "Groceries"). For the words of its anchors,
+    // only singular and plural: a shared start would link ✈️ "plane" to "plants".
+    const own = new Set(words)
+    for (const [w, s] of [...described])
+      for (const loc of locales) for (const [k, q] of inflections(w, loc)) if (own.has(w) || isNumberForm(w, k)) put(k, s * q)
     return { id: cat.id, words, anchors, described }
   })
 
@@ -171,8 +174,11 @@ export function createClassifier(options: Options): Classifier {
       if (brand) {
         brand.mass *= weight
         out.push(brand)
-        i += n
-        continue
+        // A brand that is also a word inside a longer title ("Flight to Delhi", "Hotel in Goa") counts as the word too.
+        if (n > 1 || toks.length === 1 || !isWord(nameKey(toks[i]))) {
+          i += n
+          continue
+        }
       }
       const t = toks[i++]
       const direct = new Map<string, number>()

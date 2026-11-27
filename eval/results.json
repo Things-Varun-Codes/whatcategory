@@ -4,16 +4,16 @@
       "label": "expenses",
       "overall": {
         "cases": 342,
-        "precision": 92,
+        "precision": 93,
         "recall": 60,
         "nullCorrect": 98,
-        "top1": 76
+        "top1": 77
       },
       "languages": {
         "ar": {
           "cases": 17,
           "precision": 100,
-          "recall": 60,
+          "recall": 53,
           "nullCorrect": 100,
           "top1": 73
         },
@@ -33,8 +33,8 @@
         },
         "en": {
           "cases": 33,
-          "precision": 86,
-          "recall": 43,
+          "precision": 88,
+          "recall": 50,
           "nullCorrect": 80,
           "top1": 68
         },
@@ -50,7 +50,7 @@
           "precision": 100,
           "recall": 67,
           "nullCorrect": 100,
-          "top1": 80
+          "top1": 87
         },
         "hi": {
           "cases": 16,
@@ -61,22 +61,22 @@
         },
         "it": {
           "cases": 17,
-          "precision": 80,
+          "precision": 89,
           "recall": 53,
           "nullCorrect": 100,
-          "top1": 60
+          "top1": 67
         },
         "ja": {
           "cases": 17,
           "precision": 100,
-          "recall": 73,
+          "recall": 67,
           "nullCorrect": 100,
           "top1": 87
         },
         "ko": {
           "cases": 17,
           "precision": 100,
-          "recall": 67,
+          "recall": 60,
           "nullCorrect": 100,
           "top1": 80
         },
@@ -92,7 +92,7 @@
           "precision": 90,
           "recall": 56,
           "nullCorrect": 100,
-          "top1": 75
+          "top1": 81
         },
         "pt": {
           "cases": 17,
@@ -103,10 +103,10 @@
         },
         "ru": {
           "cases": 17,
-          "precision": 90,
+          "precision": 100,
           "recall": 60,
           "nullCorrect": 100,
-          "top1": 73
+          "top1": 80
         },
         "sv": {
           "cases": 17,
@@ -117,10 +117,10 @@
         },
         "th": {
           "cases": 17,
-          "precision": 90,
+          "precision": 82,
           "recall": 60,
           "nullCorrect": 100,
-          "top1": 73
+          "top1": 67
         },
         "tr": {
           "cases": 17,
@@ -146,28 +146,26 @@
       },
       "failures": [
         "en \"Tesco\" want \"groceries\" got null",
-        "en \"Uber to airport\" want \"transport\" got flights 0.111 [app brand missing from NSI]",
+        "en \"Uber to airport\" want \"transport\" got flights 0.145 [app brand missing from NSI]",
         "en \"Shell\" want \"fuel\" got null [ambiguous brand]",
-        "en \"Flight to Lisbon\" want \"flights\" got null",
         "en \"Hotel 2 nights\" want \"accommodation\" got null",
         "en \"Airbnb Goa\" want \"accommodation\" got null [app brand missing from NSI]",
-        "en \"Movie tickets\" want \"entertainment\" got null",
         "en \"Netflix\" want \"entertainment\" got null [app brand missing from NSI]",
         "en \"Electricity bill\" want \"utilities\" got null",
         "en \"Internet\" want \"utilities\" got null [no emoji concept]",
         "en \"Amazon order\" want \"shopping\" got null [ambiguous brand]",
         "en \"New shoes\" want \"shopping\" got null",
         "en \"Resturant\" want \"eating-out\" got null [typo]",
-        "en \"Settle up\" want null got rent 0.288",
+        "en \"Settle up\" want null got rent 0.218",
         "en \"Bus to Goa\" want \"transport\" got null",
         "en \"Chai and samosa\" want \"eating-out\" got null",
         "en \"Swiggy\" want \"eating-out\" got null [app brand missing from NSI]",
         "de \"Bahnticket\" want \"transport\" got null",
-        "de \"Ferienwohnung\" want \"accommodation\" got flights 0.154",
+        "de \"Ferienwohnung\" want \"accommodation\" got flights 0.163",
         "de \"Stromrechnung\" want \"utilities\" got null",
         "de \"Miete\" want \"rent\" got null [no emoji concept]",
-        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.107",
-        "de \"Uber nach Hause\" want \"transport\" got rent 0.152 [mixed language, app brand]",
+        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.147",
+        "de \"Uber nach Hause\" want \"transport\" got rent 0.127 [mixed language, app brand]",
         "fr \"Courses Carrefour\" want \"groceries\" got null",
         "fr \"Billet de train\" want \"transport\" got null",
         "fr \"Hôtel\" want \"accommodation\" got null",
@@ -182,19 +180,19 @@
         "it \"Biglietto del treno\" want \"transport\" got null",
         "it \"Volo per Roma\" want \"flights\" got null",
         "it \"Aperitivo\" want \"drinks\" got null",
-        "it \"Bolletta della luce\" want \"utilities\" got transport 0.159",
+        "it \"Bolletta della luce\" want \"utilities\" got null",
         "it \"Affitto\" want \"rent\" got null [no emoji concept]",
         "it \"Regalo per Marco\" want \"gifts\" got null",
         "pt \"Bilhete de comboio\" want \"transport\" got null",
         "pt \"Hotel\" want \"accommodation\" got null",
         "pt \"Cinema\" want \"entertainment\" got null",
         "pt \"Conta da luz\" want \"utilities\" got null",
-        "pt \"Prenda de anos\" want \"gifts\" got shopping 0.092",
+        "pt \"Prenda de anos\" want \"gifts\" got shopping 0.094",
         "nl \"Etentje\" want \"eating-out\" got null",
         "nl \"Avondeten\" want \"eating-out\" got null",
         "nl \"Treinkaartje\" want \"transport\" got null",
-        "nl \"Vlucht naar Londen\" want \"flights\" got null",
         "nl \"Hotel Amsterdam\" want \"accommodation\" got null",
+        "nl \"Apotheek\" want \"health\" got null",
         "nl \"Energierekening\" want \"utilities\" got null",
         "nl \"Huur\" want \"rent\" got transport 0.094 [no emoji concept]",
         "pl \"Żabka\" want \"groceries\" got null",
@@ -205,13 +203,13 @@
         "pl \"Kino\" want \"entertainment\" got transport 0.139",
         "pl \"Rachunek za prąd\" want \"utilities\" got null",
         "sv \"Lunch\" want \"eating-out\" got null",
-        "sv \"Matvaror\" want \"groceries\" got transport 0.184",
+        "sv \"Matvaror\" want \"groceries\" got transport 0.199",
         "sv \"Tågbiljett\" want \"transport\" got null",
         "sv \"Flyg till Stockholm\" want \"flights\" got null",
         "sv \"Elräkning\" want \"utilities\" got null",
         "sv \"Hyra\" want \"rent\" got null [no emoji concept]",
         "ru \"Обед в кафе\" want \"eating-out\" got null",
-        "ru \"Продукты\" want \"groceries\" got rent 0.087",
+        "ru \"Продукты\" want \"groceries\" got null",
         "ru \"Билет на поезд\" want \"transport\" got null",
         "ru \"Перелёт в Москву\" want \"flights\" got null",
         "ru \"Счёт за электричество\" want \"utilities\" got null",
@@ -231,6 +229,7 @@
         "ar \"بقالة\" want \"groceries\" got null",
         "ar \"تذكرة قطار\" want \"transport\" got null",
         "ar \"فندق\" want \"accommodation\" got null",
+        "ar \"قهوة\" want [\"eating-out\",\"drinks\"] got null",
         "ar \"فاتورة الكهرباء\" want \"utilities\" got null",
         "ar \"إيجار\" want \"rent\" got null [no emoji concept]",
         "hi \"रात का खाना\" want \"eating-out\" got null",
@@ -245,10 +244,11 @@
         "ja \"ランチ\" want \"eating-out\" got null",
         "ja \"スーパーで買い物\" want \"groceries\" got null",
         "ja \"新幹線\" want \"transport\" got null",
+        "ja \"電気代\" want \"utilities\" got null",
         "zh \"晚饭\" want \"eating-out\" got null",
         "zh \"火锅\" want \"eating-out\" got null",
         "zh \"买菜\" want \"groceries\" got null",
-        "zh \"打车\" want \"transport\" got entertainment 0.167",
+        "zh \"打车\" want \"transport\" got entertainment 0.174",
         "zh \"地铁\" want \"transport\" got null",
         "zh \"机票\" want \"flights\" got null",
         "zh \"药店\" want \"health\" got null",
@@ -258,9 +258,10 @@
         "ko \"점심\" want \"eating-out\" got null",
         "ko \"지하철\" want \"transport\" got null",
         "ko \"호텔\" want \"accommodation\" got null",
+        "ko \"약국\" want \"health\" got null",
         "ko \"월세\" want \"rent\" got null [no emoji concept]",
-        "th \"ข้าวมันไก่\" want \"eating-out\" got fuel 0.095",
-        "th \"เซเว่น\" want [\"groceries\",\"shopping\"] got null",
+        "th \"ข้าวมันไก่\" want \"eating-out\" got fuel 0.117",
+        "th \"เซเว่น\" want [\"groceries\",\"shopping\"] got entertainment 0.11",
         "th \"ตั๋วรถไฟ\" want \"transport\" got null",
         "th \"โรงแรม\" want \"accommodation\" got null",
         "th \"ค่าไฟ\" want \"utilities\" got null",
@@ -271,10 +272,10 @@
       "label": "expenses (emoji only)",
       "overall": {
         "cases": 342,
-        "precision": 88,
-        "recall": 56,
-        "nullCorrect": 95,
-        "top1": 72
+        "precision": 89,
+        "recall": 57,
+        "nullCorrect": 93,
+        "top1": 71
       },
       "languages": {
         "ar": {
@@ -282,32 +283,32 @@
           "precision": 100,
           "recall": 60,
           "nullCorrect": 100,
-          "top1": 73
+          "top1": 67
         },
         "de": {
           "cases": 19,
           "precision": 82,
           "recall": 53,
           "nullCorrect": 100,
-          "top1": 53
+          "top1": 59
         },
         "el": {
           "cases": 17,
-          "precision": 92,
+          "precision": 85,
           "recall": 73,
-          "nullCorrect": 100,
-          "top1": 93
+          "nullCorrect": 50,
+          "top1": 87
         },
         "en": {
           "cases": 33,
           "precision": 79,
           "recall": 39,
           "nullCorrect": 80,
-          "top1": 54
+          "top1": 57
         },
         "es": {
           "cases": 18,
-          "precision": 80,
+          "precision": 89,
           "recall": 50,
           "nullCorrect": 100,
           "top1": 69
@@ -331,7 +332,7 @@
           "precision": 80,
           "recall": 53,
           "nullCorrect": 100,
-          "top1": 60
+          "top1": 67
         },
         "ja": {
           "cases": 17,
@@ -345,21 +346,21 @@
           "precision": 100,
           "recall": 60,
           "nullCorrect": 100,
-          "top1": 73
+          "top1": 67
         },
         "nl": {
           "cases": 17,
-          "precision": 70,
+          "precision": 78,
           "recall": 47,
           "nullCorrect": 100,
-          "top1": 73
+          "top1": 67
         },
         "pl": {
           "cases": 18,
-          "precision": 80,
-          "recall": 50,
+          "precision": 82,
+          "recall": 56,
           "nullCorrect": 100,
-          "top1": 69
+          "top1": 81
         },
         "pt": {
           "cases": 17,
@@ -370,8 +371,8 @@
         },
         "ru": {
           "cases": 17,
-          "precision": 89,
-          "recall": 53,
+          "precision": 90,
+          "recall": 60,
           "nullCorrect": 100,
           "top1": 73
         },
@@ -380,21 +381,21 @@
           "precision": 100,
           "recall": 60,
           "nullCorrect": 100,
-          "top1": 80
+          "top1": 67
         },
         "th": {
           "cases": 17,
-          "precision": 80,
+          "precision": 73,
           "recall": 53,
           "nullCorrect": 100,
-          "top1": 73
+          "top1": 67
         },
         "tr": {
           "cases": 17,
-          "precision": 82,
+          "precision": 90,
           "recall": 60,
           "nullCorrect": 50,
-          "top1": 87
+          "top1": 80
         },
         "uk": {
           "cases": 17,
@@ -408,11 +409,11 @@
           "precision": 75,
           "recall": 40,
           "nullCorrect": 100,
-          "top1": 60
+          "top1": 53
         }
       },
       "failures": [
-        "en \"Groceries\" want \"groceries\" got health 0.471",
+        "en \"Groceries\" want \"groceries\" got health 0.329",
         "en \"Tesco\" want \"groceries\" got null",
         "en \"Uber to airport\" want \"transport\" got null [app brand missing from NSI]",
         "en \"Shell\" want \"fuel\" got null [ambiguous brand]",
@@ -426,7 +427,7 @@
         "en \"Amazon order\" want \"shopping\" got null [ambiguous brand]",
         "en \"New shoes\" want \"shopping\" got null",
         "en \"Resturant\" want \"eating-out\" got null [typo]",
-        "en \"Settle up\" want null got rent 0.285",
+        "en \"Settle up\" want null got rent 0.213",
         "en \"Bus to Goa\" want \"transport\" got null",
         "en \"Chai and samosa\" want \"eating-out\" got null",
         "en \"Swiggy\" want \"eating-out\" got null [app brand missing from NSI]",
@@ -436,8 +437,8 @@
         "de \"Ferienwohnung\" want \"accommodation\" got null",
         "de \"Stromrechnung\" want \"utilities\" got null",
         "de \"Miete\" want \"rent\" got null [no emoji concept]",
-        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.107",
-        "de \"Uber nach Hause\" want \"transport\" got rent 0.154 [mixed language, app brand]",
+        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.147",
+        "de \"Uber nach Hause\" want \"transport\" got rent 0.13 [mixed language, app brand]",
         "fr \"Courses Carrefour\" want \"groceries\" got null",
         "fr \"Billet de train\" want \"transport\" got null",
         "fr \"Hôtel\" want \"accommodation\" got null",
@@ -449,15 +450,15 @@
         "es \"Metro\" want \"transport\" got fuel 0.13",
         "es \"Vuelo a Madrid\" want \"flights\" got null",
         "es \"Hotel en Sevilla\" want \"accommodation\" got null",
-        "es \"Entradas concierto\" want \"entertainment\" got gifts 0.106",
+        "es \"Entradas concierto\" want \"entertainment\" got null",
         "es \"Factura de la luz\" want \"utilities\" got null",
         "es \"Alquiler\" want \"rent\" got null [no emoji concept]",
         "it \"Pizza\" want \"eating-out\" got transport 0.086",
         "it \"Biglietto del treno\" want \"transport\" got null",
         "it \"Volo per Roma\" want \"flights\" got null",
         "it \"Aperitivo\" want \"drinks\" got null",
-        "it \"Bolletta della luce\" want \"utilities\" got transport 0.148",
-        "it \"Affitto\" want \"rent\" got null [no emoji concept]",
+        "it \"Bolletta della luce\" want \"utilities\" got null",
+        "it \"Affitto\" want \"rent\" got gifts 0.091 [no emoji concept]",
         "it \"Regalo per Marco\" want \"gifts\" got null",
         "pt \"Bilhete de comboio\" want \"transport\" got null",
         "pt \"Hotel\" want \"accommodation\" got null",
@@ -470,11 +471,10 @@
         "nl \"Treinkaartje\" want \"transport\" got null",
         "nl \"Vlucht naar Londen\" want \"flights\" got utilities 0.173",
         "nl \"Hotel Amsterdam\" want \"accommodation\" got null",
-        "nl \"Energierekening\" want \"utilities\" got drinks 0.09",
+        "nl \"Energierekening\" want \"utilities\" got null",
         "nl \"Huur\" want \"rent\" got transport 0.151 [no emoji concept]",
         "pl \"Biedronka zakupy\" want \"groceries\" got null",
-        "pl \"Żabka\" want \"groceries\" got null",
-        "pl \"Bilet na pociąg\" want \"transport\" got gifts 0.14",
+        "pl \"Bilet na pociąg\" want \"transport\" got gifts 0.124",
         "pl \"Orlen\" want \"fuel\" got null",
         "pl \"Lot do Krakowa\" want \"flights\" got null",
         "pl \"Hotel\" want \"accommodation\" got null",
@@ -486,26 +486,26 @@
         "sv \"Tågbiljett\" want \"transport\" got null",
         "sv \"Elräkning\" want \"utilities\" got null",
         "sv \"Hyra\" want \"rent\" got null [no emoji concept]",
-        "ru \"Обед в кафе\" want \"eating-out\" got null",
         "ru \"Пятёрочка\" want \"groceries\" got null",
-        "ru \"Продукты\" want \"groceries\" got rent 0.158",
+        "ru \"Продукты\" want \"groceries\" got null",
         "ru \"Билет на поезд\" want \"transport\" got null",
         "ru \"Перелёт в Москву\" want \"flights\" got null",
         "ru \"Счёт за электричество\" want \"utilities\" got null",
-        "ru \"Аренда квартиры\" want \"rent\" got null [no emoji concept]",
+        "ru \"Аренда квартиры\" want \"rent\" got accommodation 0.089 [no emoji concept]",
         "uk \"Квиток на потяг\" want \"transport\" got null",
         "uk \"Переліт до Львова\" want \"flights\" got null",
         "uk \"Оренда\" want \"rent\" got null [no emoji concept]",
-        "el \"Εισιτήριο λεωφορείου\" want \"transport\" got gifts 0.222",
+        "el \"Εισιτήριο λεωφορείου\" want \"transport\" got gifts 0.214",
         "el \"Ξενοδοχείο\" want \"accommodation\" got null",
         "el \"Λογαριασμός ρεύματος\" want \"utilities\" got null",
         "el \"Ενοίκιο\" want \"rent\" got null [no emoji concept]",
+        "el \"Επιστροφή χρημάτων\" want null got fuel 0.088",
         "tr \"Kahvaltı\" want \"eating-out\" got null",
         "tr \"Migros\" want \"groceries\" got null",
         "tr \"Market alışverişi\" want \"groceries\" got null",
         "tr \"Otobüs bileti\" want \"transport\" got null",
         "tr \"Otel\" want \"accommodation\" got null",
-        "tr \"Kira\" want \"rent\" got flights 0.087 [no emoji concept]",
+        "tr \"Kira\" want \"rent\" got null [no emoji concept]",
         "tr \"Borç ödemesi\" want null got rent 0.147",
         "ar \"كارفور\" want \"groceries\" got null",
         "ar \"بقالة\" want \"groceries\" got null",
@@ -528,7 +528,7 @@
         "zh \"火锅\" want \"eating-out\" got null",
         "zh \"超市\" want \"groceries\" got null",
         "zh \"买菜\" want \"groceries\" got null",
-        "zh \"打车\" want \"transport\" got entertainment 0.176",
+        "zh \"打车\" want \"transport\" got entertainment 0.174",
         "zh \"地铁\" want \"transport\" got null",
         "zh \"机票\" want \"flights\" got null",
         "zh \"电费\" want \"utilities\" got null",
@@ -539,9 +539,9 @@
         "ko \"지하철\" want \"transport\" got null",
         "ko \"호텔\" want \"accommodation\" got null",
         "ko \"월세\" want \"rent\" got null [no emoji concept]",
-        "th \"ข้าวมันไก่\" want \"eating-out\" got fuel 0.111",
-        "th \"เซเว่น\" want [\"groceries\",\"shopping\"] got null",
-        "th \"ตั๋วรถไฟ\" want \"transport\" got gifts 0.112",
+        "th \"ข้าวมันไก่\" want \"eating-out\" got fuel 0.108",
+        "th \"เซเว่น\" want [\"groceries\",\"shopping\"] got entertainment 0.253",
+        "th \"ตั๋วรถไฟ\" want \"transport\" got gifts 0.111",
         "th \"ตั๋วเครื่องบิน\" want \"flights\" got null",
         "th \"โรงแรม\" want \"accommodation\" got null",
         "th \"ค่าไฟ\" want \"utilities\" got null",
@@ -552,39 +552,39 @@
       "label": "todo",
       "overall": {
         "cases": 109,
-        "precision": 85,
-        "recall": 36,
-        "nullCorrect": 83,
-        "top1": 58
+        "precision": 83,
+        "recall": 34,
+        "nullCorrect": 100,
+        "top1": 57
       },
       "languages": {
         "de": {
           "cases": 9,
-          "precision": 80,
+          "precision": 100,
           "recall": 50,
           "nullCorrect": 100,
           "top1": 63
         },
         "en": {
           "cases": 10,
-          "precision": 50,
+          "precision": 67,
           "recall": 22,
-          "nullCorrect": 0,
+          "nullCorrect": 100,
           "top1": 22
         },
         "es": {
           "cases": 9,
           "precision": 100,
-          "recall": 50,
+          "recall": 25,
           "nullCorrect": 100,
           "top1": 75
         },
         "fr": {
           "cases": 9,
-          "precision": 75,
-          "recall": 38,
+          "precision": 50,
+          "recall": 25,
           "nullCorrect": 100,
-          "top1": 50
+          "top1": 38
         },
         "hi": {
           "cases": 9,
@@ -602,22 +602,22 @@
         },
         "ko": {
           "cases": 9,
-          "precision": 75,
+          "precision": 100,
           "recall": 38,
-          "nullCorrect": 0,
+          "nullCorrect": 100,
           "top1": 63
         },
         "pl": {
           "cases": 9,
-          "precision": 100,
+          "precision": 67,
           "recall": 50,
           "nullCorrect": 100,
-          "top1": 75
+          "top1": 63
         },
         "pt": {
           "cases": 9,
-          "precision": 100,
-          "recall": 13,
+          "precision": 67,
+          "recall": 25,
           "nullCorrect": 100,
           "top1": 75
         },
@@ -640,29 +640,31 @@
           "precision": 67,
           "recall": 25,
           "nullCorrect": 100,
-          "top1": 25
+          "top1": 38
         }
       },
       "failures": [
         "en \"Buy milk and eggs\" want \"shopping\" got null",
         "en \"Call the dentist\" want \"health\" got null",
-        "en \"Vacuum living room\" want \"home\" got social 0.179",
+        "en \"Vacuum living room\" want \"home\" got social 0.208",
         "en \"Water the plants\" want \"home\" got null",
         "en \"Book flights to Lisbon\" want \"travel\" got null",
         "en \"Prepare slides for client meeting\" want \"work\" got null",
         "en \"Revise for maths exam\" want \"study\" got null",
-        "en \"Think about it\" want null got shopping 0.206",
-        "de \"Milch kaufen\" want \"shopping\" got social 0.098",
+        "de \"Milch kaufen\" want \"shopping\" got null",
         "de \"Zahnarzttermin\" want \"health\" got null",
         "de \"Präsentation vorbereiten\" want \"work\" got null",
         "de \"Für die Prüfung lernen\" want \"study\" got null",
-        "fr \"Acheter du pain\" want \"shopping\" got null",
+        "fr \"Acheter du pain\" want \"shopping\" got money 0.111",
         "fr \"Payer le loyer\" want \"money\" got null",
-        "fr \"Faire la lessive\" want \"home\" got shopping 0.105",
+        "fr \"Faire la lessive\" want \"home\" got shopping 0.106",
+        "fr \"Réserver l'hôtel\" want \"travel\" got null",
         "fr \"Réunion avec l'équipe\" want \"work\" got null",
         "fr \"Réviser l'examen\" want \"study\" got null",
+        "es \"Comprar leche\" want \"shopping\" got null",
         "es \"Cita con el médico\" want \"health\" got null",
         "es \"Limpiar la cocina\" want \"home\" got null",
+        "es \"Hacer la maleta\" want \"travel\" got null",
         "es \"Enviar informe al jefe\" want \"work\" got null",
         "es \"Estudiar para el examen\" want \"study\" got null",
         "ja \"牛乳を買う\" want \"shopping\" got null",
@@ -671,17 +673,16 @@
         "ja \"洗濯\" want \"home\" got null",
         "ja \"パスポート更新\" want \"travel\" got null",
         "ja \"会議の資料\" want \"work\" got null",
-        "pl \"Kupić chleb\" want \"shopping\" got null",
+        "pl \"Kupić chleb\" want \"shopping\" got money 0.093",
         "pl \"Wizyta u lekarza\" want \"health\" got null",
         "pl \"Odkurzyć\" want \"home\" got null",
-        "pl \"Spotkanie z klientem\" want \"work\" got null",
-        "pt \"Comprar pão\" want \"shopping\" got null",
+        "pl \"Spotkanie z klientem\" want \"work\" got social 0.183",
+        "pt \"Comprar pão\" want \"shopping\" got money 0.271",
         "pt \"Consulta no dentista\" want \"health\" got null",
         "pt \"Pagar a conta da água\" want \"money\" got null",
         "pt \"Lavar a louça\" want \"home\" got null",
         "pt \"Reservar o voo\" want \"travel\" got null",
         "pt \"Reunião de trabalho\" want \"work\" got null",
-        "pt \"Estudar para a prova\" want \"study\" got null",
         "ru \"Купить молоко\" want \"shopping\" got null",
         "ru \"Записаться к врачу\" want \"health\" got null",
         "ru \"Помыть посуду\" want \"home\" got null",
@@ -706,8 +707,7 @@
         "ko \"치과 예약\" want \"health\" got null",
         "ko \"청소하기\" want \"home\" got null",
         "ko \"여권 갱신\" want \"travel\" got null",
-        "ko \"회의 준비\" want \"work\" got null",
-        "ko \"메모\" want null got health 0.277"
+        "ko \"회의 준비\" want \"work\" got null"
       ]
     },
     {
@@ -715,31 +715,31 @@
       "overall": {
         "cases": 90,
         "precision": 81,
-        "recall": 36,
+        "recall": 44,
         "nullCorrect": 60,
         "top1": 66
       },
       "languages": {
         "de": {
           "cases": 9,
-          "precision": 60,
-          "recall": 38,
+          "precision": 57,
+          "recall": 50,
           "nullCorrect": 0,
           "top1": 50
         },
         "en": {
           "cases": 9,
-          "precision": 67,
-          "recall": 25,
+          "precision": 75,
+          "recall": 38,
           "nullCorrect": 100,
           "top1": 63
         },
         "es": {
           "cases": 9,
           "precision": 100,
-          "recall": 50,
+          "recall": 75,
           "nullCorrect": 100,
-          "top1": 75
+          "top1": 88
         },
         "fr": {
           "cases": 9,
@@ -751,28 +751,28 @@
         "it": {
           "cases": 9,
           "precision": 100,
-          "recall": 50,
+          "recall": 38,
           "nullCorrect": 100,
-          "top1": 63
+          "top1": 75
         },
         "ja": {
           "cases": 9,
-          "precision": 75,
-          "recall": 38,
+          "precision": 80,
+          "recall": 50,
           "nullCorrect": 0,
-          "top1": 63
+          "top1": 50
         },
         "ko": {
           "cases": 9,
-          "precision": 75,
-          "recall": 38,
+          "precision": 80,
+          "recall": 50,
           "nullCorrect": 100,
           "top1": 63
         },
         "pt": {
           "cases": 9,
           "precision": 100,
-          "recall": 38,
+          "recall": 50,
           "nullCorrect": 100,
           "top1": 75
         },
@@ -788,22 +788,20 @@
           "precision": 75,
           "recall": 38,
           "nullCorrect": 0,
-          "top1": 75
+          "top1": 63
         }
       },
       "failures": [
         "en \"Laptop charger\" want \"electronics\" got null",
         "en \"Hammer\" want \"tools\" got null",
-        "en \"Winter jacket\" want \"clothing\" got sports 0.158",
-        "en \"Frying pan\" want \"kitchen\" got null",
+        "en \"Winter jacket\" want \"clothing\" got sports 0.177",
         "en \"Tennis racket\" want \"sports\" got null",
         "en \"Teddy bear\" want \"toys\" got null",
-        "de \"Ladekabel\" want \"electronics\" got null",
+        "de \"Ladekabel\" want \"electronics\" got sports 0.084",
         "de \"Bohrmaschine\" want \"tools\" got null",
-        "de \"Winterjacke\" want \"clothing\" got sports 0.089",
-        "de \"Fußball\" want \"sports\" got null",
+        "de \"Winterjacke\" want \"clothing\" got sports 0.139",
         "de \"Puppe\" want \"toys\" got null",
-        "de \"Kiste 3\" want null got tools 0.183",
+        "de \"Kiste 3\" want null got tools 0.22",
         "fr \"Ordinateur portable\" want \"electronics\" got null",
         "fr \"Tournevis\" want \"tools\" got null",
         "fr \"Chaussures\" want \"clothing\" got null",
@@ -811,16 +809,13 @@
         "fr \"Shampooing\" want \"bathroom\" got null",
         "fr \"Ballon de foot\" want \"sports\" got null",
         "fr \"Peluche\" want \"toys\" got null",
-        "es \"Auriculares\" want \"electronics\" got null",
         "es \"Martillo\" want \"tools\" got null",
-        "es \"Camiseta\" want \"clothing\" got null",
         "es \"Muñeca\" want \"toys\" got null",
         "ja \"充電器\" want \"electronics\" got null",
         "ja \"ハンマー\" want \"tools\" got null",
         "ja \"コート\" want \"clothing\" got null",
-        "ja \"サッカーボール\" want \"sports\" got null",
         "ja \"ぬいぐるみ\" want \"toys\" got null",
-        "ja \"箱\" want null got tools 0.081",
+        "ja \"箱\" want null got tools 0.083",
         "ru \"Ноутбук\" want \"electronics\" got null",
         "ru \"Куртка\" want \"clothing\" got null",
         "ru \"Сковорода\" want \"kitchen\" got null",
@@ -832,27 +827,26 @@
         "zh \"外套\" want \"clothing\" got null",
         "zh \"炒锅\" want \"kitchen\" got null",
         "zh \"玩具熊\" want \"toys\" got null",
-        "zh \"箱子\" want null got tools 0.29",
+        "zh \"箱子\" want null got tools 0.355",
         "pt \"Telemóvel\" want \"electronics\" got null",
         "pt \"Chave de fendas\" want \"tools\" got null",
-        "pt \"Casaco\" want \"clothing\" got null",
         "pt \"Panela\" want \"kitchen\" got null",
         "pt \"Boneca\" want \"toys\" got null",
         "it \"Cuffie\" want \"electronics\" got null",
         "it \"Cacciavite\" want \"tools\" got null",
         "it \"Giacca\" want \"clothing\" got null",
+        "it \"Padella\" want \"kitchen\" got null",
         "it \"Bambola\" want \"toys\" got null",
         "ko \"노트북\" want \"electronics\" got bathroom 0.095",
         "ko \"망치\" want \"tools\" got null",
         "ko \"외투\" want \"clothing\" got null",
-        "ko \"축구공\" want \"sports\" got null",
         "ko \"인형\" want \"toys\" got null"
       ]
     }
   ],
   "history": {
     "entries": 26,
-    "correctWithHistory": 16,
+    "correctWithHistory": 17,
     "correctWithoutHistory": 7
   }
 }

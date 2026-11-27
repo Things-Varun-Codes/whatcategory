@@ -84,7 +84,8 @@ function idPresets(locale: string): Record<string, Preset> {
 function buildWords(locale: string): WordsChunk {
   const ann = resolved(locale)
   const places = idPresets(locale)
-  const entries: [concept: string, name: string[], keywords: string[], group: string | null][] = []
+  // variant: words found only inside a merged variant's multi-word search terms ("yellow" from the teahouse's "yellow tea").
+  const entries: [concept: string, name: string[], keywords: string[], group: string | null, variant?: Set<string>][] = []
   for (const char of Object.keys(ann).sort()) {
     const e = emojiKey(char)
     const q = qualified.get(e) ?? e
@@ -92,35 +93,35 @@ function buildWords(locale: string): WordsChunk {
   }
   // Variants such as amenity/restaurant/indian are merged into their place type, so a term repeated across
   // forty cuisines ("dinner") counts as describing one concept, not forty. Their names become its keywords.
-  const merged = new Map<string, [string[], string[]]>()
+  const merged = new Map<string, [string[], string[], string[]]>()
   for (const id of Object.keys(places).sort()) {
     if (!presets[id] || presets[id].searchable === false) continue
     const p = places[id]
     const base = placeType(id)
-    const m = merged.get(base) ?? merged.set(base, [[], []]).get(base)!
+    const m = merged.get(base) ?? merged.set(base, [[], [], []]).get(base)!
     const names = [p.name ?? '', ...list(p.aliases)]
-    if (base === id) m[0].push(...names)
-    else m[1].push(...names)
-    m[1].push(...list(p.terms))
+    if (base === id) m[0].push(...names), m[1].push(...list(p.terms))
+    else m[1].push(...names), m[2].push(...list(p.terms))
   }
-  for (const [id, [name, keywords]] of merged) entries.push([id, name, keywords, null])
+  const whole = (phrase: string) => tokens(phrase).length === 1 || !/\s/.test(phrase.trim())
+  for (const [id, [name, keywords, variantTerms]] of merged) {
+    const solid = new Set([...name, ...keywords, ...variantTerms.filter(whole)].flatMap(tokens))
+    entries.push([id, name, [...keywords, ...variantTerms], null, new Set(variantTerms.flatMap(tokens).filter((w) => !solid.has(w)))])
+  }
   // Words that are a whole name or keyword somewhere in this locale. The rest ("and", "la", "of") only ever
   // appear inside longer phrases. Scripts without spaces are segmented, so their pieces count as whole.
   const standalone = new Set<string>()
-  for (const [, name, keywords] of entries)
-    for (const phrase of [...name, ...keywords]) {
-      const toks = tokens(phrase)
-      if (toks.length === 1 || !/\s/.test(phrase.trim())) toks.forEach((t) => standalone.add(t))
-    }
+  for (const [, name, keywords] of entries) for (const phrase of [...name, ...keywords]) if (whole(phrase)) tokens(phrase).forEach((t) => standalone.add(t))
   const concepts: string[] = []
   const index: Record<string, number[]> = Object.create(null)
-  for (const [concept, name, keywords, group] of entries) {
+  for (const [concept, name, keywords, group, variant] of entries) {
     const nameTokens = new Set(name.flatMap(tokens))
     const all = new Set([...nameTokens, ...keywords.flatMap(tokens)])
     if (!all.size) continue
     const i = concepts.push(concept) - 1
-    // Flags: 1 = keyword only, not in the name; 2 = never a whole name or keyword anywhere in this locale.
-    for (const w of all) (index[w] ??= []).push(i * 4 + (nameTokens.has(w) ? 0 : 1) + (standalone.has(w) ? 0 : 2))
+    // Flags: 1 = keyword only, not in the name; 2 = a fragment: never a whole name or keyword anywhere in this locale,
+    // or only inside a merged variant's multi-word search terms.
+    for (const w of all) (index[w] ??= []).push(i * 4 + (nameTokens.has(w) ? 0 : 1) + (standalone.has(w) && !variant?.has(w) ? 0 : 2))
     if (group) (index[group] ??= []).push(i * 4 + 1)
   }
   const sorted: Record<string, number[]> = {}
