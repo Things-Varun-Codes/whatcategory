@@ -65,25 +65,35 @@ function idPresets(locale: string): Record<string, Preset> {
 }
 
 function buildWords(locale: string): WordsChunk {
-  const concepts: string[] = []
-  const index: Record<string, number[]> = Object.create(null)
-  const add = (concept: string, name: string[], keywords: string[]) => {
-    const nameTokens = new Set(name.flatMap(tokens))
-    const all = new Set([...nameTokens, ...keywords.flatMap(tokens)])
-    if (!all.size) return
-    const i = concepts.push(concept) - 1
-    for (const w of all) (index[w] ??= []).push(i * 2 + (nameTokens.has(w) ? 0 : 1))
-  }
   const ann = resolved(locale)
+  const places = idPresets(locale)
+  const entries: [string, string[], string[]][] = []
   for (const char of Object.keys(ann).sort()) {
     const e = emojiKey(char)
-    if (isEmoji.has(e) && !concepts.includes(e)) add(e, ann[char].tts ?? [], ann[char].default ?? [])
+    if (isEmoji.has(e) && !entries.some(([c]) => c === e)) entries.push([e, ann[char].tts ?? [], ann[char].default ?? []])
   }
-  const places = idPresets(locale)
   for (const id of Object.keys(places).sort()) {
     if (!presets[id] || presets[id].searchable === false) continue
     const p = places[id]
-    add(id, [p.name ?? '', ...list(p.aliases)], list(p.terms))
+    entries.push([id, [p.name ?? '', ...list(p.aliases)], list(p.terms)])
+  }
+  // Words that are a whole name or keyword somewhere in this locale. The rest ("and", "la", "of") only ever
+  // appear inside longer phrases. Scripts without spaces are segmented, so their pieces count as whole.
+  const standalone = new Set<string>()
+  for (const [, name, keywords] of entries)
+    for (const phrase of [...name, ...keywords]) {
+      const toks = tokens(phrase)
+      if (toks.length === 1 || !/\s/.test(phrase.trim())) toks.forEach((t) => standalone.add(t))
+    }
+  const concepts: string[] = []
+  const index: Record<string, number[]> = Object.create(null)
+  for (const [concept, name, keywords] of entries) {
+    const nameTokens = new Set(name.flatMap(tokens))
+    const all = new Set([...nameTokens, ...keywords.flatMap(tokens)])
+    if (!all.size) continue
+    const i = concepts.push(concept) - 1
+    // Flags: 1 = keyword only, not in the name; 2 = never a whole name or keyword anywhere in this locale.
+    for (const w of all) (index[w] ??= []).push(i * 4 + (nameTokens.has(w) ? 0 : 1) + (standalone.has(w) ? 0 : 2))
   }
   const sorted: Record<string, number[]> = {}
   for (const k of Object.keys(index).sort()) sorted[k] = index[k]

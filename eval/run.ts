@@ -5,6 +5,7 @@ import { createClassifier, learn, type Category, type Chunk, type Classifier, ty
 
 const root = new URL('..', import.meta.url).pathname
 const verbose = process.argv.includes('--verbose')
+const THRESHOLD = process.argv.includes('--threshold') ? +process.argv[process.argv.indexOf('--threshold') + 1] : undefined
 const only = process.argv.includes('--set') ? process.argv[process.argv.indexOf('--set') + 1] : null
 
 /** The country whose brands an app in this language would load by default. */
@@ -23,7 +24,7 @@ async function chunk(path: string): Promise<Chunk> {
 }
 async function classifier(categories: Category[], locales: string[], regions: string[]): Promise<Classifier> {
   const data = await Promise.all([...new Set(locales)].map((l) => chunk(`words/${l}`)).concat(regions.map((r) => chunk(`brands/${r}`))))
-  return createClassifier({ categories, data })
+  return createClassifier({ categories, data, threshold: THRESHOLD })
 }
 
 interface Tally { cases: number; expectSome: number; expectNull: number; suggested: number; correct: number; nullCorrect: number }
@@ -56,7 +57,7 @@ async function runSet(set: Set, label: string) {
       if (ok && expect === null) t.nullCorrect++
     }
     if (!ok) {
-      const why = got?.why.map((r) => `${r.layer}:${r.text}→${r.match}(${r.weight})`).join(' ') ?? ''
+      const why = got?.why.map((r) => `${r.layer}:${r.text}→${r.match}${r.link && r.link !== "anchor" ? `~${r.link}` : ""}(${r.weight})`).join(' ') ?? ''
       failures.push(`${lang} ${JSON.stringify(title)} want ${JSON.stringify(expect)} got ${got ? `${got.id} ${got.confidence}` : 'null'}${note ? ` [${note}]` : ''}${verbose ? '  ' + why : ''}`)
     }
   }

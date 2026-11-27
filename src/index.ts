@@ -1,6 +1,6 @@
 import type { Chunk, BrandsChunk } from './data.ts'
 import { tokens, nameKey, emojiKey, wordMatch, fold } from './text.ts'
-import { prepareLocale, tokenEvidence, type Locale } from './words.ts'
+import { prepareLocale, tokenEvidence, inflections, entryWeight, type Locale } from './words.ts'
 
 export type { Chunk, WordsChunk, BrandsChunk } from './data.ts'
 export { tokens, fold } from './text.ts'
@@ -26,6 +26,8 @@ export interface Reason {
   text: string
   /** What it matched: an emoji, an OSM place type, a past title, or a category word. */
   match: string
+  /** How that links to the category: "anchor" (the category's own emoji or a concept its words name), or the shared word. */
+  link?: string
   weight: number
 }
 
@@ -62,6 +64,11 @@ const BRAND_IS_WORD_FACTOR = 0.3
 /** Trust in each NSI source: brands, transit networks, operators (operators also run toilets, cameras, poles). */
 const SOURCE_TRUST = [1, 0.6, 0.15]
 const HISTORY_SIMILAR_WEIGHT = 0.9
+/** A link inferred from shared words counts at most this much; anchors count 1. */
+const INFERRED_LINK = 0.7
+/** Titles carrying less evidence than one specific word are scored as if they had this much, which keeps
+ * a lone vague word from looking confident. */
+const MIN_MASS = 0.5
 const MAX_NGRAM = 4
 
 interface Evidence {
@@ -78,45 +85,47 @@ export function createClassifier(options: Options): Classifier {
   const brands: BrandsChunk[] = []
   for (const c of options.data) c.kind === 'words' ? locales.push(prepareLocale(c)) : brands.push(c)
 
-  // Every word a category is described by, with how strongly: its own words fully, the words of its anchor
-  // concepts (its emoji, and concepts its words name) in proportion to how directly they were named.
+  // Every word a category is described by, 0..1: its own words fully, and the words of its anchor concepts
+  // (its emoji, and concepts its words name or describe) as strongly as the anchor. A vague word
+  // such as "out" in "Eating out" names hundreds of concepts, so it anchors each of them only weakly.
   const categories = options.categories.map((cat) => {
     const words = (cat.words ?? []).flatMap(tokens)
     const anchors = new Map<string, number>()
-    if (cat.emoji) anchors.set(emojiKey(cat.emoji), 1)
-    for (const w of words) {
-      const ev = tokenEvidence(w, locales)
-      if (ev) for (const c of ev.hits.keys()) anchors.set(c, Math.max(anchors.get(c) ?? 0, ev.quality))
-    }
+    const anchor = (c: string, s: number) => anchors.set(c, Math.max(anchors.get(c) ?? 0, s))
+    if (cat.emoji) anchor(emojiKey(cat.emoji), 1)
+    for (const w of words)
+      for (const loc of locales)
+        for (const [k, q] of [[w, 1] as [string, number], ...inflections(w, loc)])
+          for (const p of Object.hasOwn(loc.chunk.index, k) ? loc.chunk.index[k] : [])
+            anchor(loc.chunk.concepts[p >> 2], q * loc.spec.get(k)! * entryWeight(p))
     const described = new Map<string, number>()
     const put = (w: string, s: number) => described.set(w, Math.max(described.get(w) ?? 0, s))
     for (const w of words) put(w, 1)
-    for (const [c, s] of anchors) for (const loc of locales) for (const w of loc.bags.get(c)?.keys() ?? []) put(w, s)
-    // Inflected forms of the category's own words count too ("grocery" describes a category called "Groceries").
-    const expanded = new Map(described)
-    for (const w of words)
-      for (const loc of locales)
-        for (const k of loc.keys) {
-          const q = wordMatch(w, k)
-          if (q && q < 1) expanded.set(k, Math.max(expanded.get(k) ?? 0, q))
-        }
-    return { id: cat.id, words, anchors, described: expanded }
+    for (const [c, s] of anchors) for (const loc of locales) for (const [w, bw] of loc.bags.get(c) ?? []) put(w, s * bw)
+    // Inflected forms count too ("grocery" describes a category called "Groceries").
+    for (const [w, s] of [...described]) for (const loc of locales) for (const [k, q] of inflections(w, loc)) put(k, s * q)
+    return { id: cat.id, words, anchors, described }
   })
 
-  const simCache = new Map<string, number[]>()
-  /** How strongly each category covers a concept: 1 for an anchor, else the share of the concept's words it uses. */
-  function conceptLinks(concept: string): number[] {
+  interface Link { strength: number; via: string }
+  const simCache = new Map<string, Link[]>()
+  /**
+   * How strongly each category covers a concept: 1 for an anchor, otherwise the most specific word they share,
+   * scaled down so that a category's own emoji and words always beat a link inferred from shared words.
+   * Sharing "movie" links 🎦 and 🎬; sharing "store" barely counts.
+   */
+  function conceptLinks(concept: string): Link[] {
     let links = simCache.get(concept)
     if (links) return links
-    links = categories.map((cat) => {
-      let total = 0
-      let covered = 0
-      for (const loc of locales)
-        for (const [w, s] of loc.bags.get(concept) ?? []) {
-          total += s
-          covered += s * (cat.described.get(w) ?? 0)
-        }
-      return Math.max(cat.anchors.get(concept) ?? 0, total ? covered / total : 0)
+    const words = new Map<string, number>()
+    for (const loc of locales) for (const [w, bw] of loc.bags.get(concept) ?? []) words.set(w, Math.max(words.get(w) ?? 0, loc.spec.get(w)! * bw))
+    links = categories.map((cat): Link => {
+      let best: Link = { strength: cat.anchors.get(concept) ?? 0, via: 'anchor' }
+      for (const [w, spec] of words) {
+        const s = INFERRED_LINK * spec * (cat.described.get(w) ?? 0)
+        if (s > best.strength) best = { strength: s, via: w }
+      }
+      return best
     })
     simCache.set(concept, links)
     return links
@@ -175,7 +184,7 @@ export function createClassifier(options: Options): Classifier {
       out.push({
         hits: ev?.hits ?? new Map(),
         direct,
-        mass: weight * quality,
+        mass: weight * Math.max(ev ? ev.quality * ev.spec : 0, ...direct.values()),
         reason: direct.size ? { layer: 'category', text: t, match: [...direct.keys()][0] } : { layer: 'words', text: t, match: top! },
       })
     }
@@ -184,19 +193,30 @@ export function createClassifier(options: Options): Classifier {
 
   function scoreData(title: string): Suggestion[] {
     const evs = evidence(title)
-    const totalMass = evs.reduce((s, e) => s + e.mass, 0)
-    if (!totalMass) return []
+    const mass = evs.reduce((s, e) => s + e.mass, 0)
+    if (!mass) return []
+    const totalMass = Math.max(mass, MIN_MASS)
     const scores = categories.map(() => 0)
     const why: Reason[][] = categories.map(() => [])
     for (const ev of evs) {
-      const contrib = categories.map(() => 0)
-      for (const [concept, share] of ev.hits) conceptLinks(concept).forEach((l, ci) => (contrib[ci] += share * l))
+      const contrib = categories.map(() => ({ score: 0, top: 0, concept: '', via: '' }))
+      for (const [concept, share] of ev.hits)
+        conceptLinks(concept).forEach((l, ci) => {
+          const c = contrib[ci]
+          c.score += share * l.strength
+          if (share * l.strength > c.top) Object.assign(c, { top: share * l.strength, concept, via: l.via })
+        })
       categories.forEach((cat, ci) => {
-        contrib[ci] = Math.max(contrib[ci], ev.direct.get(cat.id) ?? 0)
-        if (contrib[ci] > 0) {
-          scores[ci] += ev.mass * contrib[ci]
-          why[ci].push({ ...ev.reason, weight: +(ev.mass * contrib[ci]).toFixed(3) })
-        }
+        const c = contrib[ci]
+        const direct = ev.direct.get(cat.id) ?? 0
+        const value = Math.max(c.score, direct)
+        if (value <= 0) return
+        scores[ci] += ev.mass * value
+        const reason: Reason =
+          direct >= c.score
+            ? { layer: 'category', text: ev.reason.text, match: ev.reason.text, link: 'anchor', weight: 0 }
+            : { ...ev.reason, match: c.concept, link: c.via, weight: 0 }
+        why[ci].push({ ...reason, weight: +(ev.mass * value).toFixed(3) })
       })
     }
     return categories
