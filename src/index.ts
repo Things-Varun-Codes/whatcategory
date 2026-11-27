@@ -84,6 +84,8 @@ export function createClassifier(options: Options): Classifier {
   const locales: Locale[] = []
   const brands: BrandsChunk[] = []
   for (const c of options.data) c.kind === 'words' ? locales.push(prepareLocale(c)) : brands.push(c)
+  const display = new Map<string, string>()
+  for (const loc of locales) loc.chunk.concepts.forEach((c, i) => display.set(loc.concepts[i], c))
 
   // Every word a category is described by, 0..1: its own words fully, and the words of its anchor concepts
   // (its emoji, and concepts its words name or describe) as strongly as the anchor. A vague word
@@ -216,7 +218,7 @@ export function createClassifier(options: Options): Classifier {
         const reason: Reason =
           direct >= c.score
             ? { layer: 'category', text: ev.reason.text, match: ev.reason.text, link: 'anchor', weight: 0 }
-            : { ...ev.reason, match: c.concept, link: c.via, weight: 0 }
+            : { ...ev.reason, match: display.get(c.concept) ?? c.concept, link: c.via, weight: 0 }
         why[ci].push({ ...reason, weight: +(ev.mass * value).toFixed(3) })
       })
     }
@@ -317,3 +319,5 @@ export function createEmojiFinder(data: Chunk[]): (title: string, limit?: number
 export function learn(history: readonly HistoryEntry[], title: string, categoryId: string, at = Date.now()): HistoryEntry[] {
   return [...history, { title, categoryId, at }]
 }
+
+export { loadData, resolveLocale, availableLocales, availableRegions, type LoadOptions } from './load.ts'

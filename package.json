@@ -1,8 +1,59 @@
 {
   "name": "whatcategory",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Suggest which of your app's categories fits a short title, in any language. Offline: no LLM, no network, no API key. Built from open data (Unicode CLDR, OpenStreetMap name-suggestion-index and iD presets).",
+  "keywords": [
+    "category",
+    "categorize",
+    "classify",
+    "emoji",
+    "suggest",
+    "multilingual",
+    "offline",
+    "cldr",
+    "i18n",
+    "expense"
+  ],
+  "license": "MIT",
+  "author": "Varun Biju",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Things-Varun-Codes/whatcategory.git"
+  },
   "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./words/*": {
+      "types": "./types/words.d.ts",
+      "default": "./data/words/*.js"
+    },
+    "./brands/*": {
+      "types": "./types/brands.d.ts",
+      "default": "./data/brands/*.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "data",
+    "types",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build:data": "node scripts/build-data.ts",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "test": "vitest run",
+    "eval": "node eval/run.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "npm run build:data && npm run build"
+  },
   "devDependencies": {
     "@openstreetmap/id-tagging-schema": "7.3.0",
     "@types/node": "26.6.11",
