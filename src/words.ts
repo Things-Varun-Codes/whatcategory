@@ -77,6 +77,24 @@ function substringMin(key: string): number {
   return LOGOGRAPHIC.test(key) ? 1 : DENSE_SCRIPT.test(key) ? 2 : isAlphabetic(key) ? 5 : 3
 }
 
+/**
+ * Singular and plural of one word: one is the other plus up to two letters ("vegetable"/"vegetables", "cerveza"/"cervezas"),
+ * or English y/ies ("grocery"/"groceries"). Not a compound ("hotellnatt"), a derivation ("apotheker") or a lookalike ("petri", "chair").
+ */
+export function isNumberForm(a: string, b: string): boolean {
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a]
+  // Short words collide too easily ("chai"/"chair").
+  if (short.length < 5) return false
+  if (long.startsWith(short)) return long.length - short.length <= 2
+  return short.endsWith('y') && long === short.slice(0, -1) + 'ies'
+}
+
+/** The token itself and its singular or plural, or [] when the token is not a key here. */
+function exactMatches(token: string, loc: Locale): [string, number][] {
+  if (!Object.hasOwn(loc.chunk.index, token)) return []
+  return [[token, 1], ...inflections(token, loc).filter(([k]) => isNumberForm(token, k))]
+}
+
 function matchesIn(token: string, loc: Locale): [string, number][] {
   if (Object.hasOwn(loc.chunk.index, token)) return [[token, 1]]
   const out = inflections(token, loc)
@@ -89,15 +107,18 @@ function matchesIn(token: string, loc: Locale): [string, number][] {
   return out
 }
 
-/** Concept shares for one index key: name hits outweigh keyword hits, shares sum to 1. */
-function keyHits(loc: Locale, key: string): Map<string, number> {
+/**
+ * Concept shares for index keys with their match quality: name hits outweigh keyword hits, shares sum to 1.
+ * Several keys pool their concepts, so "hotels" (one travel agency) adds to "hotel" (a dozen concepts) without outweighing it.
+ */
+function keyHits(loc: Locale, keys: [string, number][]): Map<string, number> {
   const m = new Map<string, number>()
   let total = 0
-  for (const p of loc.chunk.index[key]) {
-    const w = entryWeight(p)
-    const c = loc.concepts[p >> 2]
-    m.set(c, Math.max(m.get(c) ?? 0, w))
-  }
+  for (const [k, q] of keys)
+    for (const p of loc.chunk.index[k]) {
+      const c = loc.concepts[p >> 2]
+      m.set(c, Math.max(m.get(c) ?? 0, q * entryWeight(p)))
+    }
   for (const w of m.values()) total += w
   for (const [c, w] of m) m.set(c, w / total)
   return m
@@ -105,6 +126,9 @@ function keyHits(loc: Locale, key: string): Map<string, number> {
 
 /** Each later locale's evidence counts this much less when a word matches in several (false friends such as fr/en "courses"). */
 const LOCALE_PRIOR = 0.5
+
+/** Specificity of one key, lowered when it only ever appears as a keyword or a fragment. */
+const keySpec = (loc: Locale, k: string) => loc.spec.get(k)! * Math.max(...loc.chunk.index[k].map(entryWeight))
 
 /** Evidence for one token. Locales are in the app's order of preference. */
 export function tokenEvidence(token: string, locales: Locale[]): TokenEvidence | null {
@@ -116,20 +140,27 @@ export function tokenEvidence(token: string, locales: Locale[]): TokenEvidence |
   // An exact match in any locale beats loose matches elsewhere: German "hund" is 🐕, not English "hundred".
   const exactSomewhere = locales.some((loc) => Object.hasOwn(loc.chunk.index, token))
   locales.forEach((loc, i) => {
-    const matches = exactSomewhere ? (Object.hasOwn(loc.chunk.index, token) ? [[token, 1] as [string, number]] : []) : matchesIn(token, loc)
+    const matches = exactSomewhere ? exactMatches(token, loc) : matchesIn(token, loc)
     if (!matches.length) return
     const best = Math.max(...matches.map(([, q]) => q))
-    // Only the best matches in this locale count, so a tail of loose matches can't drown an exact one.
-    const kept = matches.filter(([, q]) => q >= best * 0.9)
-    const qSum = kept.reduce((s, [, q]) => s + q, 0)
     const w = best * LOCALE_PRIOR ** i
-    for (const [k, q] of kept) {
-      for (const [c, share] of keyHits(loc, k)) hits.set(c, (hits.get(c) ?? 0) + w * (q / qSum) * share)
-      spec += w * (q / qSum) * loc.spec.get(k)! * Math.max(...loc.chunk.index[k].map(entryWeight))
-      via.push(`${loc.chunk.locale}:${k}`)
-    }
     weightSum += w
     quality = Math.max(quality, best)
+    if (exactSomewhere) {
+      // The token and its singular or plural are one word: one pool of concepts, with the token's own specificity.
+      for (const [c, share] of keyHits(loc, matches)) hits.set(c, (hits.get(c) ?? 0) + w * share)
+      spec += w * keySpec(loc, token)
+      via.push(...matches.map(([k]) => `${loc.chunk.locale}:${k}`))
+      return
+    }
+    // Only the best loose matches count, so a tail of them can't drown the closest.
+    const kept = matches.filter(([, q]) => q >= best * 0.9)
+    const qSum = kept.reduce((s, [, q]) => s + q, 0)
+    for (const [k, q] of kept) {
+      for (const [c, share] of keyHits(loc, [[k, 1]])) hits.set(c, (hits.get(c) ?? 0) + w * (q / qSum) * share)
+      spec += w * (q / qSum) * keySpec(loc, k)
+      via.push(`${loc.chunk.locale}:${k}`)
+    }
   })
   if (!weightSum) return null
   for (const [c, w] of hits) hits.set(c, w / weightSum)

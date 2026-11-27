@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createClassifier, createEmojiFinder, learn, tokens, type WordsChunk, type BrandsChunk } from '../src/index.ts'
 import { nameKey, wordMatch } from '../src/text.ts'
+import { isNumberForm } from '../src/words.ts'
 
 // Tiny hand-made chunks so the scoring rules can be tested without the generated data.
 const words: WordsChunk = {
@@ -36,6 +37,10 @@ describe('text', () => {
     expect(wordMatch('cervezas', 'cerveza')).toBeGreaterThan(0)
     expect(wordMatch('super', 'supermarket')).toBe(0)
     expect(wordMatch('bus', 'bush')).toBe(0)
+  })
+  it('tells singular and plural from lookalikes', () => {
+    for (const [a, b] of [['vegetables', 'vegetable'], ['grocery', 'groceries'], ['cerveza', 'cervezas']]) expect(isNumberForm(a, b)).toBe(true)
+    for (const [a, b] of [['plane', 'plants'], ['petrol', 'petri'], ['chai', 'chair'], ['hotell', 'hotellnatt']]) expect(isNumberForm(a, b)).toBe(false)
   })
 })
 

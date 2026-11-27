@@ -6,6 +6,15 @@ All notable changes to this project are listed here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- A brand name that is also a word inside a longer title counts as both: "Flight to Delhi" now suggests
+  flights, not only the travel agency named "Flight".
+- A word's singular and plural count together: "Vegetables" also matches "vegetable", and "Groceries" also
+  matches "grocery". Lookalikes don't count ("plane" and "plants", "chai" and "chair").
+- Words found only inside a merged place variant's multi-word search terms are weak evidence: the teahouse's
+  "yellow tea" made cafés (and so "Coffee" and "Chai") suggest a taxi.
+
 ## [0.1.1]
 
 ### Changed
