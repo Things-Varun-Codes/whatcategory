@@ -6,6 +6,12 @@ All notable changes to this project are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1]
+
+### Changed
+
+- Published from GitHub Actions with npm provenance, so `npm audit signatures` can check where the package was built.
+
 ## [0.1.0]
 
 ### Added
