@@ -3,13 +3,19 @@
 //                            iD tagging schema place names and search terms (ISC)
 //   data/brands/<CC>.js      name-suggestion-index brands, operators and transit networks (BSD-3-Clause)
 // Run: node scripts/build-data.ts
-import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tokens, nameKey, emojiKey } from '../src/text.ts'
 import type { WordsChunk, BrandsChunk } from '../src/data.ts'
 
 const require = createRequire(import.meta.url)
 const root = new URL('..', import.meta.url).pathname
+for (const dep of ['cldr-annotations-full', 'cldr-core', 'name-suggestion-index', '@openstreetmap/id-tagging-schema']) {
+  if (!existsSync(root + 'node_modules/' + dep)) {
+    console.error(`The upstream data packages aren't installed (${dep} is missing). Run \`npm ci\` first.`)
+    process.exit(1)
+  }
+}
 const out = (p: string) => root + 'data/' + p
 
 // ---- Unicode emoji list and subgroups. CLDR also annotates arrows, letters and symbols, which are not emoji. --
