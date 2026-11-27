@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "devDependencies": {
+    "@openstreetmap/id-tagging-schema": "7.3.0",
     "@types/node": "26.6.11",
     "cldr-annotations-full": "49.0.0",
     "cldr-core": "49.0.0",
