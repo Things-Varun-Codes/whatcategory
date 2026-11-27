@@ -27,14 +27,15 @@ async function classifier(categories: Category[], locales: string[], regions: st
   return createClassifier({ categories, data, threshold: THRESHOLD })
 }
 
-interface Tally { cases: number; expectSome: number; expectNull: number; suggested: number; correct: number; nullCorrect: number }
-const tally = (): Tally => ({ cases: 0, expectSome: 0, expectNull: 0, suggested: 0, correct: 0, nullCorrect: 0 })
+interface Tally { cases: number; expectSome: number; expectNull: number; suggested: number; correct: number; nullCorrect: number; top1: number }
+const tally = (): Tally => ({ cases: 0, expectSome: 0, expectNull: 0, suggested: 0, correct: 0, nullCorrect: 0, top1: 0 })
 const pct = (a: number, b: number) => (b ? Math.round((100 * a) / b) : null)
 const metrics = (t: Tally) => ({
   cases: t.cases,
   precision: pct(t.correct, t.suggested),
   recall: pct(t.correct, t.expectSome),
   nullCorrect: pct(t.nullCorrect, t.expectNull),
+  top1: pct(t.top1, t.expectSome),
 })
 
 async function runSet(set: Set, label: string) {
@@ -47,6 +48,7 @@ async function runSet(set: Set, label: string) {
     const key = `${lang}|${region}`
     if (!cache.has(key)) cache.set(key, await classifier(set.categories, [lang, 'en'], [region]))
     const got = cache.get(key)!.suggest(title)
+    const first = cache.get(key)!.rank(title)[0]
     const ok = expect === null ? got === null : got !== null && [expect].flat().includes(got.id)
     for (const t of [all, byLang.get(lang) ?? byLang.set(lang, tally()).get(lang)!]) {
       t.cases++
@@ -55,6 +57,7 @@ async function runSet(set: Set, label: string) {
       if (got) t.suggested++
       if (ok && expect !== null) t.correct++
       if (ok && expect === null) t.nullCorrect++
+      if (expect !== null && first && [expect].flat().includes(first.id)) t.top1++
     }
     if (!ok) {
       const why = got?.why.map((r) => `${r.layer}:${r.text}→${r.match}${r.link && r.link !== "anchor" ? `~${r.link}` : ""}(${r.weight})`).join(' ') ?? ''
@@ -97,7 +100,7 @@ for (const name of ['expenses', 'todo', 'inventory']) {
 const history = only ? null : await runHistory()
 
 for (const r of runs) {
-  console.log(`\n${r.label}: precision ${r.overall.precision}%  recall ${r.overall.recall}%  null-correct ${r.overall.nullCorrect}%  (${r.overall.cases} cases)`)
+  console.log(`\n${r.label}: precision ${r.overall.precision}%  recall ${r.overall.recall}%  null-correct ${r.overall.nullCorrect}%  top-1 ${r.overall.top1}%  (${r.overall.cases} cases)`)
   if (verbose) for (const f of r.failures) console.log('  ✗ ' + f)
 }
 if (history) console.log(`\nhistory: ${history.correctWithHistory}/${history.entries} with history, ${history.correctWithoutHistory}/${history.entries} without`)

@@ -12,14 +12,19 @@ const require = createRequire(import.meta.url)
 const root = new URL('..', import.meta.url).pathname
 const out = (p: string) => root + 'data/' + p
 
-// ---- Unicode emoji list: CLDR also annotates arrows, letters and symbols, which are not emoji ------------
-const isEmoji = new Set<string>()
+// ---- Unicode emoji list and subgroups. CLDR also annotates arrows, letters and symbols, which are not emoji. --
+/** emoji → "#subgroup", a pseudo-word shared by emoji in the same Unicode subgroup (🚌 and 🚕: "#transport-ground"). */
+const subgroupOf = new Map<string, string>()
 {
   let group = ''
+  let sub = ''
   for (const line of readFileSync(root + 'upstream/emoji-test.txt', 'utf8').split('\n')) {
     if (line.startsWith('# group: ')) group = line.slice(9).trim()
-    else if (group !== 'Component' && /; (fully-qualified|unqualified|minimally-qualified)/.test(line))
-      isEmoji.add(emojiKey(line.split('#')[1].trim().split(' ')[0]))
+    else if (line.startsWith('# subgroup: ')) sub = line.slice(12).trim()
+    else if (group !== 'Component' && /; (fully-qualified|unqualified|minimally-qualified)/.test(line)) {
+      const e = emojiKey(line.split('#')[1].trim().split(' ')[0])
+      if (!subgroupOf.has(e)) subgroupOf.set(e, '#' + sub)
+    }
   }
 }
 
@@ -53,6 +58,9 @@ const presets: Record<string, { searchable?: boolean }> = require(idDir + 'prese
 const idLocales = new Set(readdirSync(idDir + 'translations').map((f) => f.replace(/\.json$/, '')))
 const likely: Record<string, string> = require('cldr-core/supplemental/likelySubtags.json').supplemental.likelySubtags
 type Preset = { name?: string; aliases?: string | string[]; terms?: string | string[] }
+/** The OSM key/value a preset is about: "amenity/restaurant/indian" → "amenity/restaurant". Relation presets
+ * put the real value third ("type/route/bus"), so they keep three parts. */
+const placeType = (id: string) => id.split('/').slice(0, id.startsWith('type/') ? 3 : 2).join('/')
 const list = (v?: string | string[]) => (Array.isArray(v) ? v : (v ?? '').split(',')).filter(Boolean)
 
 /** iD translation file for a CLDR locale: exact, then the likely region (pt → pt-BR, zh-Hant → zh-TW), then the language. */
@@ -67,16 +75,25 @@ function idPresets(locale: string): Record<string, Preset> {
 function buildWords(locale: string): WordsChunk {
   const ann = resolved(locale)
   const places = idPresets(locale)
-  const entries: [string, string[], string[]][] = []
+  const entries: [concept: string, name: string[], keywords: string[], group: string | null][] = []
   for (const char of Object.keys(ann).sort()) {
     const e = emojiKey(char)
-    if (isEmoji.has(e) && !entries.some(([c]) => c === e)) entries.push([e, ann[char].tts ?? [], ann[char].default ?? []])
+    if (subgroupOf.has(e) && !entries.some(([c]) => c === e)) entries.push([e, ann[char].tts ?? [], ann[char].default ?? [], subgroupOf.get(e)!])
   }
+  // Variants such as amenity/restaurant/indian are merged into their place type, so a term repeated across
+  // forty cuisines ("dinner") counts as describing one concept, not forty. Their names become its keywords.
+  const merged = new Map<string, [string[], string[]]>()
   for (const id of Object.keys(places).sort()) {
     if (!presets[id] || presets[id].searchable === false) continue
     const p = places[id]
-    entries.push([id, [p.name ?? '', ...list(p.aliases)], list(p.terms)])
+    const base = placeType(id)
+    const m = merged.get(base) ?? merged.set(base, [[], []]).get(base)!
+    const names = [p.name ?? '', ...list(p.aliases)]
+    if (base === id) m[0].push(...names)
+    else m[1].push(...names)
+    m[1].push(...list(p.terms))
   }
+  for (const [id, [name, keywords]] of merged) entries.push([id, name, keywords, null])
   // Words that are a whole name or keyword somewhere in this locale. The rest ("and", "la", "of") only ever
   // appear inside longer phrases. Scripts without spaces are segmented, so their pieces count as whole.
   const standalone = new Set<string>()
@@ -87,13 +104,14 @@ function buildWords(locale: string): WordsChunk {
     }
   const concepts: string[] = []
   const index: Record<string, number[]> = Object.create(null)
-  for (const [concept, name, keywords] of entries) {
+  for (const [concept, name, keywords, group] of entries) {
     const nameTokens = new Set(name.flatMap(tokens))
     const all = new Set([...nameTokens, ...keywords.flatMap(tokens)])
     if (!all.size) continue
     const i = concepts.push(concept) - 1
     // Flags: 1 = keyword only, not in the name; 2 = never a whole name or keyword anywhere in this locale.
     for (const w of all) (index[w] ??= []).push(i * 4 + (nameTokens.has(w) ? 0 : 1) + (standalone.has(w) ? 0 : 2))
+    if (group) (index[group] ??= []).push(i * 4 + 1)
   }
   const sorted: Record<string, number[]> = {}
   for (const k of Object.keys(index).sort()) sorted[k] = index[k]
@@ -131,13 +149,16 @@ function locationCountries(include: unknown[] = []): string[] {
 /** NSI path "brands/shop/supermarket" → iD preset id "shop/supermarket" (transit routes live under "type/"). */
 function placeOf(path: string): string | null {
   const kv = path.split('/').slice(1).join('/')
-  return [kv, 'type/' + kv].find((id) => presets[id] && presets[id].searchable !== false) ?? null
+  const id = [kv, 'type/' + kv].find((id) => presets[id] && presets[id].searchable !== false)
+  return id ? placeType(id) : null
 }
 const SOURCE: Record<string, number> = { brands: 0, transit: 1, operators: 2 }
 const tagPaths = Object.keys(nsi).filter((k) => k.split('/')[0] in SOURCE)
 
 const NAME_FIELDS = /^(name|brand|operator|network|short_name|official_name)(:.+)?$/
-const perCountry = new Map<string, Map<string, Set<number>>>() // country → nameKey → place * 4 + source
+// country → nameKey → place * 4 + source → how many NSI items with that name are of that place type, weighted.
+// Tesco is mostly supermarkets and convenience stores, with a few fuel stations and pharmacies.
+const perCountry = new Map<string, Map<string, Map<number, number>>>()
 const placeIds: string[] = []
 for (const path of tagPaths.sort()) {
   const place = placeOf(path)
@@ -149,25 +170,35 @@ for (const path of tagPaths.sort()) {
     const names = new Set<string>([item.displayName, ...(item.matchNames ?? [])])
     for (const [k, v] of Object.entries(item.tags)) if (NAME_FIELDS.test(k)) names.add(v)
     const keys = [...names].map(nameKey).filter((k) => k.length >= 2)
+    // Sub-brands extend the parent's name ("Tesco Extra", "Tesco Express"), so they also count for "Tesco".
+    const family = [...names].map((n) => nameKey(n.split(/\s+/)[0])).filter((k) => k.length >= 2 && !keys.includes(k))
     for (const c of locationCountries(item.locationSet.include)) {
       const m = perCountry.get(c) ?? perCountry.set(c, new Map()).get(c)!
-      for (const k of keys) (m.get(k) ?? m.set(k, new Set()).get(k)!).add(packed)
+      // An item named exactly so counts 2, a sub-brand 1.
+      for (const [ks, n] of [[new Set(keys), 2], [new Set(family), 1]] as const)
+        for (const k of ks) {
+          const counts = m.get(k) ?? m.set(k, new Map()).get(k)!
+          counts.set(packed, (counts.get(packed) ?? 0) + n)
+        }
     }
   }
 }
 
 function buildBrands(region: string): BrandsChunk {
-  const merged = new Map<string, Set<number>>()
+  const merged = new Map<string, Map<number, number>>()
   for (const src of [perCountry.get('001'), perCountry.get(region)])
-    for (const [k, packed] of src ?? []) for (const p of packed) (merged.get(k) ?? merged.set(k, new Set()).get(k)!).add(p)
+    for (const [k, counts] of src ?? []) {
+      const m = merged.get(k) ?? merged.set(k, new Map()).get(k)!
+      for (const [p, n] of counts) m.set(p, (m.get(p) ?? 0) + n)
+    }
   const places: string[] = []
   const local = new Map<number, number>()
   const names: Record<string, number[]> = {}
   for (const k of [...merged.keys()].sort()) {
-    names[k] = [...merged.get(k)!].sort((a, b) => a - b).map((p) => {
+    names[k] = [...merged.get(k)!].sort((a, b) => a[0] - b[0]).flatMap(([p, n]) => {
       const g = p >> 2
       if (!local.has(g)) local.set(g, places.push(placeIds[g]) - 1)
-      return local.get(g)! * 4 + (p & 3)
+      return [local.get(g)! * 4 + (p & 3), n]
     })
   }
   return { kind: 'brands', region, places, names }

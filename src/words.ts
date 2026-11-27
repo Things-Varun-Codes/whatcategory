@@ -10,7 +10,10 @@ export const FRAGMENT_WEIGHT = 0.25
 /** Weight of one packed index entry. */
 export const entryWeight = (p: number) => (p & 1 ? KEYWORD_WEIGHT : 1) * (p & 2 ? FRAGMENT_WEIGHT : 1)
 const SUBSTRING_QUALITY = 0.7
-const DENSE_SCRIPT = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u
+/** Steepness of the specificity curve: higher punishes common words harder. */
+export const SPEC_POWER = 2
+const DENSE_SCRIPT = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u
+const LOGOGRAPHIC = /^\p{Script=Han}+$/u
 
 export interface Locale {
   chunk: WordsChunk
@@ -31,7 +34,7 @@ export function prepareLocale(chunk: WordsChunk): Locale {
   const n = chunk.concepts.length
   for (const k of keys) {
     const packed = chunk.index[k]
-    spec.set(k, (Math.log(n / new Set(packed.map((p) => p >> 2)).size) / Math.log(n)) ** 2)
+    spec.set(k, (Math.log(n / new Set(packed.map((p) => p >> 2)).size) / Math.log(n)) ** SPEC_POWER)
     for (const p of packed) {
       const c = chunk.concepts[p >> 2]
       const bag = bags.get(c) ?? bags.set(c, new Map()).get(c)!
@@ -63,9 +66,12 @@ export interface TokenEvidence {
   via: string[]
 }
 
-/** Shortest index key that may match inside a longer token (compounds such as "Stromrechnung" ⊃ "strom"). */
+/**
+ * Shortest index key that may match inside a longer token (compounds such as "Stromrechnung" ⊃ "strom").
+ * A Han character carries meaning alone (药 "medicine" in 药店 "pharmacy"); kana and hangul are syllables.
+ */
 function substringMin(key: string): number {
-  return DENSE_SCRIPT.test(key) ? 2 : isAlphabetic(key) ? 5 : 3
+  return LOGOGRAPHIC.test(key) ? 1 : DENSE_SCRIPT.test(key) ? 2 : isAlphabetic(key) ? 5 : 3
 }
 
 function matchesIn(token: string, loc: Locale): [string, number][] {

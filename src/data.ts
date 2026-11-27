@@ -19,7 +19,7 @@ export interface BrandsChunk {
   region: string
   /** OSM "key/value" paths the names are tagged with. */
   places: string[]
-  /** nameKey(name) → packed entries: placeIndex * 4 + source (0 = brand, 1 = transit network, 2 = operator). */
+  /** nameKey(name) → pairs of [placeIndex * 4 + source (0 = brand, 1 = transit network, 2 = operator), weight: 2 per item with that exact name, 1 per sub-brand]. */
   names: Record<string, number[]>
 }
 

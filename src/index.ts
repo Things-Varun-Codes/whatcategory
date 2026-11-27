@@ -53,7 +53,7 @@ export interface Classifier {
   rank(title: string, history?: readonly HistoryEntry[]): Suggestion[]
 }
 
-export const DEFAULT_THRESHOLD = 0.3
+export const DEFAULT_THRESHOLD = 0.08
 /** Each later word counts a little less, so the first concept in "Taxi to hotel" wins a tie. */
 const POSITION_DECAY = 0.15
 /** A brand name counts this much relative to a word; the whole title being a brand counts more. */
@@ -138,9 +138,10 @@ export function createClassifier(options: Options): Classifier {
     const hits = new Map<string, number>()
     for (const b of brands) {
       if (!Object.hasOwn(b.names, key)) continue
-      for (const p of b.names[key]) {
-        const place = b.places[p >> 2]
-        hits.set(place, Math.max(hits.get(place) ?? 0, SOURCE_TRUST[p & 3]))
+      const e = b.names[key]
+      for (let i = 0; i < e.length; i += 2) {
+        const place = b.places[e[i] >> 2]
+        hits.set(place, Math.max(hits.get(place) ?? 0, SOURCE_TRUST[e[i] & 3] * e[i + 1]))
       }
     }
     if (!hits.size) return null
@@ -219,10 +220,21 @@ export function createClassifier(options: Options): Classifier {
         why[ci].push({ ...reason, weight: +(ev.mass * value).toFixed(3) })
       })
     }
+    // Confidence is the lead over the runner-up: diffuse evidence that fits several categories is not a suggestion.
+    const raw = scores.map((x) => x / totalMass)
+    const [first = 0, second = 0] = [...raw].sort((a, b) => b - a)
+    const lead = (x: number) => (x === first ? x - second : x - first)
     return categories
-      .map((cat, ci) => ({ id: cat.id, confidence: +(scores[ci] / totalMass).toFixed(3), why: why[ci] }))
-      .filter((s) => s.confidence > 0)
-      .sort((a, b) => b.confidence - a.confidence)
+      .map((cat, ci) => ({
+        id: cat.id,
+        confidence: +Math.max(0, lead(raw[ci])).toFixed(3),
+        // Reasons that carry under 5% of the score are noise in an explanation.
+        why: why[ci].filter((r) => r.weight >= 0.05 * scores[ci]).sort((a, b) => b.weight - a.weight),
+        score: raw[ci],
+      }))
+      .filter((s) => s.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(({ score, ...s }) => s)
   }
 
   function scoreHistory(title: string, history: readonly HistoryEntry[]): { exact?: Suggestion; similar: Suggestion[] } {
@@ -254,8 +266,8 @@ export function createClassifier(options: Options): Classifier {
     const h = scoreHistory(title, history.filter((e) => known.has(e.categoryId)))
     if (h.exact) return [h.exact]
     const data = scoreData(title)
-    // Similar past titles only matter when the open data is unsure.
-    if (h.similar.length && (!data.length || data[0].confidence < threshold) && h.similar[0].confidence >= threshold) {
+    // Similar past titles only matter when the open data is less sure than they are.
+    if (h.similar.length && h.similar[0].confidence > (data[0]?.confidence ?? 0)) {
       return [...h.similar, ...data.filter((d) => !h.similar.some((s) => s.id === d.id))]
     }
     return data
