@@ -7,7 +7,7 @@
 export interface WordsChunk {
   kind: 'words'
   locale: string
-  /** Emoji without FE0F, or an OSM "key/value" path. */
+  /** A fully-qualified emoji, or an OSM "key/value" path. */
   concepts: string[]
   /** token → packed entries: conceptIndex * 4 + flags (1 = keyword or search term, not the name; 2 = never a whole name or keyword in this locale, like "and"). */
   index: Record<string, number[]>

@@ -41,7 +41,7 @@
         "es": {
           "cases": 18,
           "precision": 100,
-          "recall": 63,
+          "recall": 69,
           "nullCorrect": 100,
           "top1": 75
         },
@@ -110,8 +110,8 @@
         },
         "sv": {
           "cases": 17,
-          "precision": 89,
-          "recall": 53,
+          "precision": 90,
+          "recall": 60,
           "nullCorrect": 100,
           "top1": 73
         },
@@ -166,15 +166,14 @@
         "de \"Ferienwohnung\" want \"accommodation\" got flights 0.154",
         "de \"Stromrechnung\" want \"utilities\" got null",
         "de \"Miete\" want \"rent\" got null [no emoji concept]",
-        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.093",
-        "de \"Uber nach Hause\" want \"transport\" got rent 0.12 [mixed language, app brand]",
+        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.107",
+        "de \"Uber nach Hause\" want \"transport\" got rent 0.152 [mixed language, app brand]",
         "fr \"Courses Carrefour\" want \"groceries\" got null",
         "fr \"Billet de train\" want \"transport\" got null",
         "fr \"Hôtel\" want \"accommodation\" got null",
         "fr \"Facture d'électricité\" want \"utilities\" got null",
         "fr \"Loyer\" want \"rent\" got null [no emoji concept]",
         "es \"Tapas con amigos\" want \"eating-out\" got null",
-        "es \"Compra semanal\" want \"groceries\" got null",
         "es \"Metro\" want \"transport\" got null",
         "es \"Hotel en Sevilla\" want \"accommodation\" got null",
         "es \"Entradas concierto\" want \"entertainment\" got null",
@@ -183,7 +182,7 @@
         "it \"Biglietto del treno\" want \"transport\" got null",
         "it \"Volo per Roma\" want \"flights\" got null",
         "it \"Aperitivo\" want \"drinks\" got null",
-        "it \"Bolletta della luce\" want \"utilities\" got transport 0.134",
+        "it \"Bolletta della luce\" want \"utilities\" got transport 0.159",
         "it \"Affitto\" want \"rent\" got null [no emoji concept]",
         "it \"Regalo per Marco\" want \"gifts\" got null",
         "pt \"Bilhete de comboio\" want \"transport\" got null",
@@ -209,7 +208,6 @@
         "sv \"Matvaror\" want \"groceries\" got transport 0.184",
         "sv \"Tågbiljett\" want \"transport\" got null",
         "sv \"Flyg till Stockholm\" want \"flights\" got null",
-        "sv \"Hotell\" want \"accommodation\" got null",
         "sv \"Elräkning\" want \"utilities\" got null",
         "sv \"Hyra\" want \"rent\" got null [no emoji concept]",
         "ru \"Обед в кафе\" want \"eating-out\" got null",
@@ -291,7 +289,7 @@
           "precision": 82,
           "recall": 53,
           "nullCorrect": 100,
-          "top1": 59
+          "top1": 53
         },
         "el": {
           "cases": 17,
@@ -309,7 +307,7 @@
         },
         "es": {
           "cases": 18,
-          "precision": 89,
+          "precision": 80,
           "recall": 50,
           "nullCorrect": 100,
           "top1": 69
@@ -333,7 +331,7 @@
           "precision": 80,
           "recall": 53,
           "nullCorrect": 100,
-          "top1": 53
+          "top1": 60
         },
         "ja": {
           "cases": 17,
@@ -380,7 +378,7 @@
         "sv": {
           "cases": 17,
           "precision": 100,
-          "recall": 53,
+          "recall": 60,
           "nullCorrect": 100,
           "top1": 80
         },
@@ -438,8 +436,8 @@
         "de \"Ferienwohnung\" want \"accommodation\" got null",
         "de \"Stromrechnung\" want \"utilities\" got null",
         "de \"Miete\" want \"rent\" got null [no emoji concept]",
-        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.093",
-        "de \"Uber nach Hause\" want \"transport\" got rent 0.15 [mixed language, app brand]",
+        "de \"dm Drogerie\" want [\"health\",\"shopping\"] got gifts 0.107",
+        "de \"Uber nach Hause\" want \"transport\" got rent 0.154 [mixed language, app brand]",
         "fr \"Courses Carrefour\" want \"groceries\" got null",
         "fr \"Billet de train\" want \"transport\" got null",
         "fr \"Hôtel\" want \"accommodation\" got null",
@@ -451,14 +449,14 @@
         "es \"Metro\" want \"transport\" got fuel 0.13",
         "es \"Vuelo a Madrid\" want \"flights\" got null",
         "es \"Hotel en Sevilla\" want \"accommodation\" got null",
-        "es \"Entradas concierto\" want \"entertainment\" got null",
+        "es \"Entradas concierto\" want \"entertainment\" got gifts 0.106",
         "es \"Factura de la luz\" want \"utilities\" got null",
         "es \"Alquiler\" want \"rent\" got null [no emoji concept]",
         "it \"Pizza\" want \"eating-out\" got transport 0.086",
         "it \"Biglietto del treno\" want \"transport\" got null",
         "it \"Volo per Roma\" want \"flights\" got null",
         "it \"Aperitivo\" want \"drinks\" got null",
-        "it \"Bolletta della luce\" want \"utilities\" got transport 0.12",
+        "it \"Bolletta della luce\" want \"utilities\" got transport 0.148",
         "it \"Affitto\" want \"rent\" got null [no emoji concept]",
         "it \"Regalo per Marco\" want \"gifts\" got null",
         "pt \"Bilhete de comboio\" want \"transport\" got null",
@@ -486,7 +484,6 @@
         "sv \"ICA\" want \"groceries\" got null",
         "sv \"Matvaror\" want \"groceries\" got null",
         "sv \"Tågbiljett\" want \"transport\" got null",
-        "sv \"Hotell\" want \"accommodation\" got null",
         "sv \"Elräkning\" want \"utilities\" got null",
         "sv \"Hyra\" want \"rent\" got null [no emoji concept]",
         "ru \"Обед в кафе\" want \"eating-out\" got null",
@@ -555,10 +552,10 @@
       "label": "todo",
       "overall": {
         "cases": 109,
-        "precision": 86,
-        "recall": 37,
+        "precision": 85,
+        "recall": 36,
         "nullCorrect": 83,
-        "top1": 57
+        "top1": 58
       },
       "languages": {
         "de": {
@@ -620,9 +617,9 @@
         "pt": {
           "cases": 9,
           "precision": 100,
-          "recall": 25,
+          "recall": 13,
           "nullCorrect": 100,
-          "top1": 63
+          "top1": 75
         },
         "ru": {
           "cases": 9,
@@ -661,7 +658,7 @@
         "de \"Für die Prüfung lernen\" want \"study\" got null",
         "fr \"Acheter du pain\" want \"shopping\" got null",
         "fr \"Payer le loyer\" want \"money\" got null",
-        "fr \"Faire la lessive\" want \"home\" got shopping 0.097",
+        "fr \"Faire la lessive\" want \"home\" got shopping 0.105",
         "fr \"Réunion avec l'équipe\" want \"work\" got null",
         "fr \"Réviser l'examen\" want \"study\" got null",
         "es \"Cita con el médico\" want \"health\" got null",
@@ -684,6 +681,7 @@
         "pt \"Lavar a louça\" want \"home\" got null",
         "pt \"Reservar o voo\" want \"travel\" got null",
         "pt \"Reunião de trabalho\" want \"work\" got null",
+        "pt \"Estudar para a prova\" want \"study\" got null",
         "ru \"Купить молоко\" want \"shopping\" got null",
         "ru \"Записаться к врачу\" want \"health\" got null",
         "ru \"Помыть посуду\" want \"home\" got null",
@@ -716,10 +714,10 @@
       "label": "inventory",
       "overall": {
         "cases": 90,
-        "precision": 78,
-        "recall": 35,
-        "nullCorrect": 50,
-        "top1": 65
+        "precision": 81,
+        "recall": 36,
+        "nullCorrect": 60,
+        "top1": 66
       },
       "languages": {
         "de": {
@@ -745,15 +743,15 @@
         },
         "fr": {
           "cases": 9,
-          "precision": 50,
+          "precision": 100,
           "recall": 13,
-          "nullCorrect": 0,
+          "nullCorrect": 100,
           "top1": 63
         },
         "it": {
           "cases": 9,
           "precision": 100,
-          "recall": 38,
+          "recall": 50,
           "nullCorrect": 100,
           "top1": 63
         },
@@ -776,7 +774,7 @@
           "precision": 100,
           "recall": 38,
           "nullCorrect": 100,
-          "top1": 63
+          "top1": 75
         },
         "ru": {
           "cases": 9,
@@ -813,7 +811,6 @@
         "fr \"Shampooing\" want \"bathroom\" got null",
         "fr \"Ballon de foot\" want \"sports\" got null",
         "fr \"Peluche\" want \"toys\" got null",
-        "fr \"Carton\" want null got sports 0.092",
         "es \"Auriculares\" want \"electronics\" got null",
         "es \"Martillo\" want \"tools\" got null",
         "es \"Camiseta\" want \"clothing\" got null",
@@ -844,7 +841,6 @@
         "it \"Cuffie\" want \"electronics\" got null",
         "it \"Cacciavite\" want \"tools\" got null",
         "it \"Giacca\" want \"clothing\" got null",
-        "it \"Padella\" want \"kitchen\" got null",
         "it \"Bambola\" want \"toys\" got null",
         "ko \"노트북\" want \"electronics\" got bathroom 0.095",
         "ko \"망치\" want \"tools\" got null",

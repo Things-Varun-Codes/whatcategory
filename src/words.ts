@@ -1,6 +1,6 @@
 // Word → concept evidence from loaded word chunks.
 import type { WordsChunk } from './data.ts'
-import { isAlphabetic, wordMatch } from './text.ts'
+import { isAlphabetic, wordMatch, emojiKey } from './text.ts'
 
 /** A keyword counts this much relative to a word in the concept's own name. */
 export const KEYWORD_WEIGHT = 0.5
@@ -17,6 +17,8 @@ const LOGOGRAPHIC = /^\p{Script=Han}+$/u
 
 export interface Locale {
   chunk: WordsChunk
+  /** Concept ids, with emoji compared without FE0F (🍽️ and 🍽 are the same concept). */
+  concepts: string[]
   keys: string[]
   /** Concept → the words describing it, weighted 1, or FRAGMENT_WEIGHT for words that are never a phrase on their own. */
   bags: Map<string, Map<string, number>>
@@ -31,18 +33,19 @@ export function prepareLocale(chunk: WordsChunk): Locale {
   const bags = new Map<string, Map<string, number>>()
   const spec = new Map<string, number>()
   const stems = new Map<string, string[]>()
-  const n = chunk.concepts.length
+  const concepts = chunk.concepts.map(emojiKey)
+  const n = concepts.length
   for (const k of keys) {
     const packed = chunk.index[k]
     spec.set(k, (Math.log(n / new Set(packed.map((p) => p >> 2)).size) / Math.log(n)) ** SPEC_POWER)
     for (const p of packed) {
-      const c = chunk.concepts[p >> 2]
+      const c = concepts[p >> 2]
       const bag = bags.get(c) ?? bags.set(c, new Map()).get(c)!
       bag.set(k, Math.max(bag.get(k) ?? 0, p & 2 ? FRAGMENT_WEIGHT : 1))
     }
     if (k.length >= 4) (stems.get(k.slice(0, 4)) ?? stems.set(k.slice(0, 4), []).get(k.slice(0, 4))!).push(k)
   }
-  return { chunk, keys, bags, spec, stems }
+  return { chunk, concepts, keys, bags, spec, stems }
 }
 
 /** Keys in this locale that are inflected forms of a word, with match quality (exact excluded). */
@@ -92,7 +95,7 @@ function keyHits(loc: Locale, key: string): Map<string, number> {
   let total = 0
   for (const p of loc.chunk.index[key]) {
     const w = entryWeight(p)
-    const c = loc.chunk.concepts[p >> 2]
+    const c = loc.concepts[p >> 2]
     m.set(c, Math.max(m.get(c) ?? 0, w))
   }
   for (const w of m.values()) total += w
@@ -110,8 +113,10 @@ export function tokenEvidence(token: string, locales: Locale[]): TokenEvidence |
   let quality = 0
   let spec = 0
   let weightSum = 0
+  // An exact match in any locale beats loose matches elsewhere: German "hund" is 🐕, not English "hundred".
+  const exactSomewhere = locales.some((loc) => Object.hasOwn(loc.chunk.index, token))
   locales.forEach((loc, i) => {
-    const matches = matchesIn(token, loc)
+    const matches = exactSomewhere ? (Object.hasOwn(loc.chunk.index, token) ? [[token, 1] as [string, number]] : []) : matchesIn(token, loc)
     if (!matches.length) return
     const best = Math.max(...matches.map(([, q]) => q))
     // Only the best matches in this locale count, so a tail of loose matches can't drown an exact one.

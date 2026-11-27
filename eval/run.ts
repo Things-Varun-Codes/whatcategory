@@ -46,7 +46,7 @@ async function runSet(set: Set, label: string) {
   for (const [lang, title, expect, note, country] of set.cases) {
     const region = country ?? COUNTRY[lang]
     const key = `${lang}|${region}`
-    if (!cache.has(key)) cache.set(key, await classifier(set.categories, [lang, 'en'], [region]))
+    if (!cache.has(key)) cache.set(key, await classifier(set.categories, [lang, 'en'], ['001', region]))
     const got = cache.get(key)!.suggest(title)
     const first = cache.get(key)!.rank(title)[0]
     const ok = expect === null ? got === null : got !== null && [expect].flat().includes(got.id)
@@ -75,7 +75,7 @@ async function runSet(set: Set, label: string) {
 async function runHistory() {
   const h = JSON.parse(readFileSync(root + 'eval/sets/history.json', 'utf8'))
   const set: Set = JSON.parse(readFileSync(root + `eval/sets/${h.set}.json`, 'utf8'))
-  const c = await classifier(set.categories, h.locales, h.regions)
+  const c = await classifier(set.categories, h.locales, ['001', ...h.regions])
   let history: HistoryEntry[] = []
   let withH = 0
   let without = 0

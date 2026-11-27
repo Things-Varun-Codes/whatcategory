@@ -97,7 +97,7 @@ export function createClassifier(options: Options): Classifier {
       for (const loc of locales)
         for (const [k, q] of [[w, 1] as [string, number], ...inflections(w, loc)])
           for (const p of Object.hasOwn(loc.chunk.index, k) ? loc.chunk.index[k] : [])
-            anchor(loc.chunk.concepts[p >> 2], q * loc.spec.get(k)! * entryWeight(p))
+            anchor(loc.concepts[p >> 2], q * loc.spec.get(k)! * entryWeight(p))
     const described = new Map<string, number>()
     const put = (w: string, s: number) => described.set(w, Math.max(described.get(w) ?? 0, s))
     for (const w of words) put(w, 1)
@@ -141,7 +141,7 @@ export function createClassifier(options: Options): Classifier {
       const e = b.names[key]
       for (let i = 0; i < e.length; i += 2) {
         const place = b.places[e[i] >> 2]
-        hits.set(place, Math.max(hits.get(place) ?? 0, SOURCE_TRUST[e[i] & 3] * e[i + 1]))
+        hits.set(place, (hits.get(place) ?? 0) + SOURCE_TRUST[e[i] & 3] * e[i + 1])
       }
     }
     if (!hits.size) return null
@@ -279,6 +279,37 @@ export function createClassifier(options: Options): Classifier {
       const top = rank(title, history)[0]
       return top && top.confidence >= threshold ? top : null
     },
+  }
+}
+
+export interface EmojiMatch {
+  emoji: string
+  /** 0..1, share of the title's evidence. */
+  score: number
+}
+
+/**
+ * Emoji that match a title, best first, without any categories: "Gitarre" → 🎸. Uses the CLDR words in the
+ * given word chunks. Brands are not used here; they link to place types, not emoji.
+ */
+export function createEmojiFinder(data: Chunk[]): (title: string, limit?: number) => EmojiMatch[] {
+  const locales = data.filter((c) => c.kind === 'words').map(prepareLocale)
+  const display = new Map<string, string>()
+  for (const loc of locales) loc.chunk.concepts.forEach((c, i) => display.set(loc.concepts[i], c))
+  return (title, limit = 5) => {
+    const scores = new Map<string, number>()
+    let total = 0
+    tokens(title).forEach((t, i) => {
+      const ev = tokenEvidence(t, locales)
+      if (!ev) return
+      const mass = (ev.quality * ev.spec) / (1 + POSITION_DECAY * i)
+      total += mass
+      for (const [c, share] of ev.hits) if (!c.includes('/')) scores.set(c, (scores.get(c) ?? 0) + mass * share)
+    })
+    return [...scores]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limit)
+      .map(([c, s]) => ({ emoji: display.get(c) ?? c, score: +(s / Math.max(total, MIN_MASS)).toFixed(3) }))
   }
 }
 

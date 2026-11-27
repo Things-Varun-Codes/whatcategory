@@ -15,6 +15,8 @@ const out = (p: string) => root + 'data/' + p
 // ---- Unicode emoji list and subgroups. CLDR also annotates arrows, letters and symbols, which are not emoji. --
 /** emoji → "#subgroup", a pseudo-word shared by emoji in the same Unicode subgroup (🚌 and 🚕: "#transport-ground"). */
 const subgroupOf = new Map<string, string>()
+/** emoji key → fully-qualified form with FE0F, so ✈ displays as ✈️. */
+const qualified = new Map<string, string>()
 {
   let group = ''
   let sub = ''
@@ -24,6 +26,7 @@ const subgroupOf = new Map<string, string>()
     else if (group !== 'Component' && /; (fully-qualified|unqualified|minimally-qualified)/.test(line)) {
       const e = emojiKey(line.split('#')[1].trim().split(' ')[0])
       if (!subgroupOf.has(e)) subgroupOf.set(e, '#' + sub)
+      if (line.includes('; fully-qualified')) qualified.set(e, line.split('#')[1].trim().split(' ')[0])
     }
   }
 }
@@ -78,7 +81,8 @@ function buildWords(locale: string): WordsChunk {
   const entries: [concept: string, name: string[], keywords: string[], group: string | null][] = []
   for (const char of Object.keys(ann).sort()) {
     const e = emojiKey(char)
-    if (subgroupOf.has(e) && !entries.some(([c]) => c === e)) entries.push([e, ann[char].tts ?? [], ann[char].default ?? [], subgroupOf.get(e)!])
+    const q = qualified.get(e) ?? e
+    if (subgroupOf.has(e) && !entries.some(([c]) => c === q)) entries.push([q, ann[char].tts ?? [], ann[char].default ?? [], subgroupOf.get(e)!])
   }
   // Variants such as amenity/restaurant/indian are merged into their place type, so a term repeated across
   // forty cuisines ("dinner") counts as describing one concept, not forty. Their names become its keywords.
@@ -184,18 +188,17 @@ for (const path of tagPaths.sort()) {
   }
 }
 
+/** Brands for one region. Worldwide brands live in their own "001" chunk, which apps load alongside. */
 function buildBrands(region: string): BrandsChunk {
-  const merged = new Map<string, Map<number, number>>()
-  for (const src of [perCountry.get('001'), perCountry.get(region)])
-    for (const [k, counts] of src ?? []) {
-      const m = merged.get(k) ?? merged.set(k, new Map()).get(k)!
-      for (const [p, n] of counts) m.set(p, (m.get(p) ?? 0) + n)
-    }
   const places: string[] = []
   const local = new Map<number, number>()
   const names: Record<string, number[]> = {}
-  for (const k of [...merged.keys()].sort()) {
-    names[k] = [...merged.get(k)!].sort((a, b) => a[0] - b[0]).flatMap(([p, n]) => {
+  const src = perCountry.get(region) ?? new Map()
+  for (const k of [...src.keys()].sort()) {
+    let entries = [...src.get(k)!].sort((a, b) => a[0] - b[0])
+    // A name that is a brand doesn't need its operator entries ("Shell" also operates toilets and pipelines).
+    if (entries.some(([p]) => (p & 3) === 0)) entries = entries.filter(([p]) => (p & 3) !== 2)
+    names[k] = entries.flatMap(([p, n]) => {
       const g = p >> 2
       if (!local.has(g)) local.set(g, places.push(placeIds[g]) - 1)
       return [local.get(g)! * 4 + (p & 3), n]
@@ -218,7 +221,7 @@ for (const l of [...available].sort()) {
   write(out(`words/${l}.js`), c)
   sizes.push([`words/${l}`, JSON.stringify(c).length])
 }
-for (const cc of countries) {
+for (const cc of ['001', ...countries]) {
   const c = buildBrands(cc)
   write(out(`brands/${cc}.js`), c)
   sizes.push([`brands/${cc}`, JSON.stringify(c).length])

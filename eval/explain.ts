@@ -7,7 +7,7 @@ const root = new URL('..', import.meta.url).pathname
 const lang = arg('--lang', 'en')
 const set = JSON.parse(readFileSync(`${root}eval/sets/${arg('--set', 'expenses')}.json`, 'utf8'))
 const load = async (p: string) => (await import(`${root}data/${p}.js`)).default
-const data = await Promise.all([...new Set([lang, 'en'])].map((l) => load(`words/${l}`)).concat(load(`brands/${arg('--region', 'GB')}`)))
+const data = await Promise.all([...new Set([lang, 'en'])].map((l) => load(`words/${l}`)).concat(load('brands/001'), load(`brands/${arg('--region', 'GB')}`)))
 const c = createClassifier({ categories: set.categories, data })
 for (const s of c.rank(process.argv[2]).slice(0, 4)) {
   console.log(`${s.id} ${s.confidence}`)
