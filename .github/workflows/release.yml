@@ -1,6 +1,6 @@
 name: Release
 
-# Publishes to npm when a GitHub release is published, after the same checks as CI.
+# Publishes to npm when a GitHub release is published, if the same checks as CI pass.
 # Uses npm trusted publishing: npm checks this workflow's identity, so no npm token is stored.
 on:
   release:
@@ -31,6 +31,8 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: The release tag matches package.json
         run: test "v$(node -p "require('./package.json').version")" = "${{ github.event.release.tag_name }}"
+      # Trusted publishing needs npm 11.5 or newer; Node 22 ships npm 10.
+      - run: npm install --global npm@12.2.3
       - run: npm ci
       # prepack rebuilds data and dist from the same pinned inputs CI just tested.
       - run: npm publish --access public --provenance
