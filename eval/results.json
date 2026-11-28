@@ -7,7 +7,7 @@
         "precision": 93,
         "recall": 60,
         "nullCorrect": 98,
-        "top1": 77
+        "top1": 76
       },
       "languages": {
         "ar": {
@@ -71,14 +71,14 @@
           "precision": 100,
           "recall": 67,
           "nullCorrect": 100,
-          "top1": 87
+          "top1": 93
         },
         "ko": {
           "cases": 17,
           "precision": 100,
           "recall": 60,
           "nullCorrect": 100,
-          "top1": 80
+          "top1": 73
         },
         "nl": {
           "cases": 17,
@@ -96,7 +96,7 @@
         },
         "pt": {
           "cases": 17,
-          "precision": 91,
+          "precision": 100,
           "recall": 67,
           "nullCorrect": 100,
           "top1": 87
@@ -141,7 +141,7 @@
           "precision": 86,
           "recall": 40,
           "nullCorrect": 100,
-          "top1": 73
+          "top1": 67
         }
       },
       "failures": [
@@ -187,7 +187,7 @@
         "pt \"Hotel\" want \"accommodation\" got null",
         "pt \"Cinema\" want \"entertainment\" got null",
         "pt \"Conta da luz\" want \"utilities\" got null",
-        "pt \"Prenda de anos\" want \"gifts\" got shopping 0.094",
+        "pt \"Prenda de anos\" want \"gifts\" got null",
         "nl \"Etentje\" want \"eating-out\" got null",
         "nl \"Avondeten\" want \"eating-out\" got null",
         "nl \"Treinkaartje\" want \"transport\" got null",
@@ -203,7 +203,7 @@
         "pl \"Kino\" want \"entertainment\" got transport 0.139",
         "pl \"Rachunek za prąd\" want \"utilities\" got null",
         "sv \"Lunch\" want \"eating-out\" got null",
-        "sv \"Matvaror\" want \"groceries\" got transport 0.199",
+        "sv \"Matvaror\" want \"groceries\" got transport 0.128",
         "sv \"Tågbiljett\" want \"transport\" got null",
         "sv \"Flyg till Stockholm\" want \"flights\" got null",
         "sv \"Elräkning\" want \"utilities\" got null",
@@ -248,7 +248,7 @@
         "zh \"晚饭\" want \"eating-out\" got null",
         "zh \"火锅\" want \"eating-out\" got null",
         "zh \"买菜\" want \"groceries\" got null",
-        "zh \"打车\" want \"transport\" got entertainment 0.174",
+        "zh \"打车\" want \"transport\" got entertainment 0.177",
         "zh \"地铁\" want \"transport\" got null",
         "zh \"机票\" want \"flights\" got null",
         "zh \"药店\" want \"health\" got null",
@@ -552,10 +552,10 @@
       "label": "todo",
       "overall": {
         "cases": 109,
-        "precision": 83,
-        "recall": 34,
-        "nullCorrect": 100,
-        "top1": 57
+        "precision": 86,
+        "recall": 37,
+        "nullCorrect": 92,
+        "top1": 60
       },
       "languages": {
         "de": {
@@ -570,18 +570,18 @@
           "precision": 67,
           "recall": 22,
           "nullCorrect": 100,
-          "top1": 22
+          "top1": 33
         },
         "es": {
           "cases": 9,
-          "precision": 100,
-          "recall": 25,
-          "nullCorrect": 100,
-          "top1": 75
+          "precision": 75,
+          "recall": 38,
+          "nullCorrect": 0,
+          "top1": 63
         },
         "fr": {
           "cases": 9,
-          "precision": 50,
+          "precision": 67,
           "recall": 25,
           "nullCorrect": 100,
           "top1": 38
@@ -589,37 +589,37 @@
         "hi": {
           "cases": 9,
           "precision": 100,
-          "recall": 38,
+          "recall": 50,
           "nullCorrect": 100,
           "top1": 75
         },
         "ja": {
           "cases": 9,
           "precision": 100,
-          "recall": 25,
+          "recall": 38,
           "nullCorrect": 100,
-          "top1": 50
+          "top1": 63
         },
         "ko": {
           "cases": 9,
           "precision": 100,
           "recall": 38,
           "nullCorrect": 100,
-          "top1": 63
+          "top1": 75
         },
         "pl": {
           "cases": 9,
-          "precision": 67,
+          "precision": 80,
           "recall": 50,
           "nullCorrect": 100,
-          "top1": 63
+          "top1": 75
         },
         "pt": {
           "cases": 9,
           "precision": 67,
           "recall": 25,
           "nullCorrect": 100,
-          "top1": 75
+          "top1": 63
         },
         "ru": {
           "cases": 9,
@@ -640,13 +640,13 @@
           "precision": 67,
           "recall": 25,
           "nullCorrect": 100,
-          "top1": 38
+          "top1": 50
         }
       },
       "failures": [
         "en \"Buy milk and eggs\" want \"shopping\" got null",
         "en \"Call the dentist\" want \"health\" got null",
-        "en \"Vacuum living room\" want \"home\" got social 0.208",
+        "en \"Vacuum living room\" want \"home\" got social 0.237",
         "en \"Water the plants\" want \"home\" got null",
         "en \"Book flights to Lisbon\" want \"travel\" got null",
         "en \"Prepare slides for client meeting\" want \"work\" got null",
@@ -655,28 +655,27 @@
         "de \"Zahnarzttermin\" want \"health\" got null",
         "de \"Präsentation vorbereiten\" want \"work\" got null",
         "de \"Für die Prüfung lernen\" want \"study\" got null",
-        "fr \"Acheter du pain\" want \"shopping\" got money 0.111",
+        "fr \"Acheter du pain\" want \"shopping\" got null",
         "fr \"Payer le loyer\" want \"money\" got null",
-        "fr \"Faire la lessive\" want \"home\" got shopping 0.106",
+        "fr \"Faire la lessive\" want \"home\" got shopping 0.114",
         "fr \"Réserver l'hôtel\" want \"travel\" got null",
         "fr \"Réunion avec l'équipe\" want \"work\" got null",
         "fr \"Réviser l'examen\" want \"study\" got null",
-        "es \"Comprar leche\" want \"shopping\" got null",
         "es \"Cita con el médico\" want \"health\" got null",
         "es \"Limpiar la cocina\" want \"home\" got null",
         "es \"Hacer la maleta\" want \"travel\" got null",
         "es \"Enviar informe al jefe\" want \"work\" got null",
         "es \"Estudiar para el examen\" want \"study\" got null",
+        "es \"Pendiente\" want null got money 0.096",
         "ja \"牛乳を買う\" want \"shopping\" got null",
         "ja \"歯医者の予約\" want \"health\" got null",
-        "ja \"家賃を払う\" want \"money\" got null",
         "ja \"洗濯\" want \"home\" got null",
         "ja \"パスポート更新\" want \"travel\" got null",
         "ja \"会議の資料\" want \"work\" got null",
-        "pl \"Kupić chleb\" want \"shopping\" got money 0.093",
+        "pl \"Kupić chleb\" want \"shopping\" got null",
         "pl \"Wizyta u lekarza\" want \"health\" got null",
         "pl \"Odkurzyć\" want \"home\" got null",
-        "pl \"Spotkanie z klientem\" want \"work\" got social 0.183",
+        "pl \"Spotkanie z klientem\" want \"work\" got social 0.201",
         "pt \"Comprar pão\" want \"shopping\" got money 0.271",
         "pt \"Consulta no dentista\" want \"health\" got null",
         "pt \"Pagar a conta da água\" want \"money\" got null",
@@ -694,7 +693,6 @@
         "zh \"准备会议\" want \"work\" got social 0.121",
         "zh \"复习考试\" want \"study\" got null",
         "hi \"दूध खरीदना\" want \"shopping\" got null",
-        "hi \"डॉक्टर से मिलना\" want \"health\" got null",
         "hi \"टिकट बुक करना\" want \"travel\" got null",
         "hi \"मीटिंग की तैयारी\" want \"work\" got null",
         "hi \"परीक्षा की पढ़ाई\" want \"study\" got null",
@@ -714,17 +712,17 @@
       "label": "inventory",
       "overall": {
         "cases": 90,
-        "precision": 81,
-        "recall": 44,
-        "nullCorrect": 60,
-        "top1": 66
+        "precision": 93,
+        "recall": 48,
+        "nullCorrect": 100,
+        "top1": 70
       },
       "languages": {
         "de": {
           "cases": 9,
-          "precision": 57,
+          "precision": 67,
           "recall": 50,
-          "nullCorrect": 0,
+          "nullCorrect": 100,
           "top1": 50
         },
         "en": {
@@ -732,21 +730,21 @@
           "precision": 75,
           "recall": 38,
           "nullCorrect": 100,
-          "top1": 63
+          "top1": 75
         },
         "es": {
           "cases": 9,
           "precision": 100,
-          "recall": 75,
+          "recall": 50,
           "nullCorrect": 100,
-          "top1": 88
+          "top1": 63
         },
         "fr": {
           "cases": 9,
           "precision": 100,
-          "recall": 13,
+          "recall": 38,
           "nullCorrect": 100,
-          "top1": 63
+          "top1": 75
         },
         "it": {
           "cases": 9,
@@ -757,77 +755,70 @@
         },
         "ja": {
           "cases": 9,
-          "precision": 80,
+          "precision": 100,
           "recall": 50,
-          "nullCorrect": 0,
+          "nullCorrect": 100,
           "top1": 50
         },
         "ko": {
-          "cases": 9,
-          "precision": 80,
-          "recall": 50,
-          "nullCorrect": 100,
-          "top1": 63
-        },
-        "pt": {
           "cases": 9,
           "precision": 100,
           "recall": 50,
           "nullCorrect": 100,
           "top1": 75
         },
+        "pt": {
+          "cases": 9,
+          "precision": 100,
+          "recall": 50,
+          "nullCorrect": 100,
+          "top1": 88
+        },
         "ru": {
           "cases": 9,
-          "precision": 75,
-          "recall": 38,
-          "nullCorrect": 0,
+          "precision": 100,
+          "recall": 75,
+          "nullCorrect": 100,
           "top1": 75
         },
         "zh": {
           "cases": 9,
-          "precision": 75,
+          "precision": 100,
           "recall": 38,
-          "nullCorrect": 0,
-          "top1": 63
+          "nullCorrect": 100,
+          "top1": 75
         }
       },
       "failures": [
         "en \"Laptop charger\" want \"electronics\" got null",
         "en \"Hammer\" want \"tools\" got null",
-        "en \"Winter jacket\" want \"clothing\" got sports 0.177",
+        "en \"Winter jacket\" want \"clothing\" got sports 0.193",
         "en \"Tennis racket\" want \"sports\" got null",
         "en \"Teddy bear\" want \"toys\" got null",
-        "de \"Ladekabel\" want \"electronics\" got sports 0.084",
+        "de \"Ladekabel\" want \"electronics\" got sports 0.098",
         "de \"Bohrmaschine\" want \"tools\" got null",
         "de \"Winterjacke\" want \"clothing\" got sports 0.139",
         "de \"Puppe\" want \"toys\" got null",
-        "de \"Kiste 3\" want null got tools 0.22",
         "fr \"Ordinateur portable\" want \"electronics\" got null",
         "fr \"Tournevis\" want \"tools\" got null",
         "fr \"Chaussures\" want \"clothing\" got null",
-        "fr \"Poêle\" want \"kitchen\" got null",
         "fr \"Shampooing\" want \"bathroom\" got null",
-        "fr \"Ballon de foot\" want \"sports\" got null",
         "fr \"Peluche\" want \"toys\" got null",
+        "es \"Auriculares\" want \"electronics\" got null",
         "es \"Martillo\" want \"tools\" got null",
+        "es \"Camiseta\" want \"clothing\" got null",
         "es \"Muñeca\" want \"toys\" got null",
         "ja \"充電器\" want \"electronics\" got null",
         "ja \"ハンマー\" want \"tools\" got null",
         "ja \"コート\" want \"clothing\" got null",
         "ja \"ぬいぐるみ\" want \"toys\" got null",
-        "ja \"箱\" want null got tools 0.083",
         "ru \"Ноутбук\" want \"electronics\" got null",
-        "ru \"Куртка\" want \"clothing\" got null",
-        "ru \"Сковорода\" want \"kitchen\" got null",
-        "ru \"Футбольный мяч\" want \"sports\" got null",
         "ru \"Кукла\" want \"toys\" got null",
-        "ru \"Коробка\" want null got tools 0.17",
         "zh \"手机\" want \"electronics\" got null",
         "zh \"锤子\" want \"tools\" got null",
         "zh \"外套\" want \"clothing\" got null",
         "zh \"炒锅\" want \"kitchen\" got null",
         "zh \"玩具熊\" want \"toys\" got null",
-        "zh \"箱子\" want null got tools 0.355",
         "pt \"Telemóvel\" want \"electronics\" got null",
         "pt \"Chave de fendas\" want \"tools\" got null",
         "pt \"Panela\" want \"kitchen\" got null",
@@ -837,10 +828,129 @@
         "it \"Giacca\" want \"clothing\" got null",
         "it \"Padella\" want \"kitchen\" got null",
         "it \"Bambola\" want \"toys\" got null",
-        "ko \"노트북\" want \"electronics\" got bathroom 0.095",
+        "ko \"노트북\" want \"electronics\" got null",
         "ko \"망치\" want \"tools\" got null",
         "ko \"외투\" want \"clothing\" got null",
         "ko \"인형\" want \"toys\" got null"
+      ]
+    },
+    {
+      "label": "wordforms",
+      "overall": {
+        "cases": 97,
+        "precision": 77,
+        "recall": 93,
+        "nullCorrect": 53,
+        "top1": 98
+      },
+      "languages": {
+        "de": {
+          "cases": 9,
+          "precision": 63,
+          "recall": 83,
+          "nullCorrect": 0,
+          "top1": 83
+        },
+        "el": {
+          "cases": 3,
+          "precision": 100,
+          "recall": 100,
+          "nullCorrect": 100,
+          "top1": 100
+        },
+        "en": {
+          "cases": 26,
+          "precision": 72,
+          "recall": 100,
+          "nullCorrect": 62,
+          "top1": 100
+        },
+        "es": {
+          "cases": 10,
+          "precision": 63,
+          "recall": 100,
+          "nullCorrect": 40,
+          "top1": 100
+        },
+        "fi": {
+          "cases": 4,
+          "precision": 100,
+          "recall": 100,
+          "nullCorrect": 100,
+          "top1": 100
+        },
+        "fr": {
+          "cases": 9,
+          "precision": 67,
+          "recall": 80,
+          "nullCorrect": 50,
+          "top1": 100
+        },
+        "it": {
+          "cases": 10,
+          "precision": 71,
+          "recall": 83,
+          "nullCorrect": 50,
+          "top1": 100
+        },
+        "nl": {
+          "cases": 5,
+          "precision": 100,
+          "recall": 100,
+          "nullCorrect": 100,
+          "top1": 100
+        },
+        "pl": {
+          "cases": 3,
+          "precision": 100,
+          "recall": 100,
+          "nullCorrect": null,
+          "top1": 100
+        },
+        "pt": {
+          "cases": 5,
+          "precision": 80,
+          "recall": 100,
+          "nullCorrect": 0,
+          "top1": 100
+        },
+        "ru": {
+          "cases": 7,
+          "precision": 83,
+          "recall": 83,
+          "nullCorrect": 0,
+          "top1": 100
+        },
+        "tr": {
+          "cases": 6,
+          "precision": 100,
+          "recall": 100,
+          "nullCorrect": 100,
+          "top1": 100
+        }
+      },
+      "failures": [
+        "en \"Tablet\" want null got furniture 0.287",
+        "en \"Classic\" want null got classes 0.217",
+        "en \"Booking\" want null got books 0.584",
+        "en \"Billiards\" want null got cards 0.155",
+        "en \"Personal trainer\" want null got trains 0.122",
+        "it \"Case\" want \"casa\" got null",
+        "it \"Trenta\" want null got treni 0.113 [thirty]",
+        "it \"Posto auto\" want null got posta 0.344 [parking space]",
+        "ru \"За квартиру\" want \"flat\" got null",
+        "ru \"Банка варенья\" want null got bank 0.535 [jar of jam]",
+        "fr \"Voyager\" want \"voyages\" got null",
+        "fr \"Santon\" want null got cadeaux 0.09 [figurine]",
+        "fr \"Porte\" want null got port 0.711 [door]",
+        "es \"Carrera\" want null got carro 0.605 [race, degree]",
+        "es \"Puerto\" want null got puerta 0.705 [port]",
+        "es \"Libra\" want null got libros 0.605 [pound]",
+        "de \"Züge\" want \"zug\" got null",
+        "de \"Flügel\" want null got flug 0.447 [wing, grand piano]",
+        "de \"Buche\" want null got buch 0.747 [beech]",
+        "de \"Buchung\" want null got buch 0.643 [booking]",
+        "pt \"Porto\" want null got porta 0.677 [port]"
       ]
     }
   ],

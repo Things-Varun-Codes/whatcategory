@@ -1,6 +1,6 @@
 // Word → concept evidence from loaded word chunks.
 import type { WordsChunk } from './data.ts'
-import { isAlphabetic, wordMatch, emojiKey } from './text.ts'
+import { isAlphabetic, wordMatch, emojiKey, endingPair } from './text.ts'
 
 /** A keyword counts this much relative to a word in the concept's own name. */
 export const KEYWORD_WEIGHT = 0.5
@@ -26,6 +26,7 @@ export interface Locale {
   spec: Map<string, number>
   /** First four letters → keys, to find inflected forms without scanning every key. */
   stems: Map<string, string[]>
+  endings: Set<string>
 }
 
 export function prepareLocale(chunk: WordsChunk): Locale {
@@ -45,7 +46,17 @@ export function prepareLocale(chunk: WordsChunk): Locale {
     }
     if (k.length >= 4) (stems.get(k.slice(0, 4)) ?? stems.set(k.slice(0, 4), []).get(k.slice(0, 4))!).push(k)
   }
-  return { chunk, concepts, keys, bags, spec, stems }
+  return { chunk, concepts, keys, bags, spec, stems, endings: new Set(chunk.endings) }
+}
+
+/**
+ * Two words that start the same are forms of one word when this locale's data backs their endings: "pizza"/"pizze" in
+ * Italian, "train"/"trains" in English, but not "train"/"trail". The shape alone cannot tell these apart.
+ */
+export function sameForm(a: string, b: string, loc: Locale): boolean {
+  if (!wordMatch(a, b)) return false
+  // A locale with too few words to learn any ending from has only the shape to go by.
+  return !loc.endings.size || loc.endings.has(endingPair(a, b))
 }
 
 /** Keys in this locale that are inflected forms of a word, with match quality (exact excluded). */

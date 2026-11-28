@@ -114,29 +114,36 @@ There are no hand-written word lists. Everything general comes from the data:
 
 - **Specificity.** A word that describes hundreds of concepts ("face", "store") counts for little.
 - **Phrase fragments.** A word that is never a name or keyword on its own anywhere in its locale ("and", "la", "का") counts for little.
+- **Word forms.** "Pizze" is "pizza" and "trains" is "train", but "trail" is not. Which endings join forms of one word is
+  learned for each locale from its own words: Italian gets a/e and o/i, English s, y/ies and (shop)ping, Turkish lar.
 - **Locale preference.** When a word exists in several loaded locales, the first locale wins (French "courses" is not English "courses").
 - **Brands.** Weight comes from how many NSI items of each place type carry the name, and sub-brands count ("Tesco Extra" counts for "Tesco").
 
 ## Accuracy
 
-Measured on 541 hand-labelled titles in 19 languages (en, de, fr, es, it, pt, nl, pl, sv, ru, uk, el, tr, ar, hi, ja, zh, ko, th), including titles that should get no suggestion. Per-language numbers and every failure are in [eval/RESULTS.md](eval/RESULTS.md).
+Measured on 638 hand-labelled titles in 20 languages (en, de, fr, es, it, pt, nl, pl, sv, fi, ru, uk, el, tr, ar, hi, ja, zh, ko, th), including titles that should get no suggestion. Per-language numbers and every failure are in [eval/RESULTS.md](eval/RESULTS.md).
 
 | Category set | Precision | Recall | No-suggestion correct | Best guess right (top-1) |
 |---|---|---|---|---|
-| Expenses: emoji + English name | 92% | 60% | 98% | 76% |
-| Expenses: emoji only | 88% | 56% | 95% | 72% |
-| To-do list | 85% | 36% | 83% | 58% |
-| Home inventory: English words only | 81% | 36% | 60% | 66% |
+| Expenses: emoji + English name | 93% | 60% | 98% | 76% |
+| Expenses: emoji only | 89% | 57% | 93% | 71% |
+| To-do list | 86% | 37% | 92% | 60% |
+| Home inventory: English words only | 93% | 48% | 100% | 70% |
+| Word forms: one word per category, in the title's language | 77% | 93% | 53% | 98% |
 
-**What this means:** when it suggests something, it is usually right. It stays silent on a third to a half of titles, and history fills those in for each user. Replaying one user's 26 expenses in order, history raised correct suggestions from 7 to 16.
+**What this means:** when it suggests something, it is usually right. It stays silent on a third to a half of titles, and history fills those in for each user. Replaying one user's 26 expenses in order, history raised correct suggestions from 7 to 17.
 
-The labels were written by the author, not by native speakers of all 19 languages. Corrections are welcome.
+The labels were written by the author, not by native speakers of all 20 languages. Corrections are welcome.
 
 ## Limitations
 
 - **Concepts without an emoji or place type** are mostly missed: rent, subscriptions, insurance, salary.
 - **App and online brands** (Uber, Airbnb, Netflix, Swiggy) are not in OpenStreetMap data. History learns them after one use.
 - **Ambiguous brands** (Shell, Tesco, Amazon) spread across what they sell, so confidence is low.
+- **Lookalike words** are told apart only by their endings. A different word with an ending that the language also
+  uses for forms of one word still matches a category's word: "booking" for Books, Spanish "puerto" for Puerta. So
+  can a title word that the data doesn't know ("tablet" for Table). About half of such titles in the evaluation still
+  get a suggestion. Rare and irregular forms are missed: German "Züge" for Zug, French "voyager" for Voyages.
 - **Typos** are not corrected ("Resturant").
 - **Loose inflection matching** can link unrelated words that share a start ("Flug" and "Flügel").
 - **Closely related categories** such as Groceries and Shopping, or Transport and Fuel, share vocabulary and get confused. Distinct emoji help.

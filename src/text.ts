@@ -52,3 +52,17 @@ export function wordMatch(a: string, b: string): number {
   while (n < short && a[n] === b[n]) n++
   return n >= 4 && n >= 0.7 * short && n >= 0.5 * long ? PREFIX_QUALITY * Math.sqrt(n / long) : 0
 }
+
+/**
+ * What is left of two words after their shared start, as one key: "pizza"/"pizze" → "a~e", "train"/"trains" → "~s".
+ * An ending that first repeats the last shared letter is marked instead: "shop"/"shopping" → "~+ing", for any letter.
+ * Each locale's words chunk lists the pairs that its own words show to be forms of one word.
+ */
+export function endingPair(a: string, b: string): string {
+  let n = 0
+  while (n < a.length && n < b.length && a[n] === b[n]) n++
+  let x = a.slice(n)
+  let y = b.slice(n)
+  if (x > y) [x, y] = [y, x]
+  return n && !x && y[0] === a[n - 1] ? `~+${y.slice(1)}` : `${x}~${y}`
+}

@@ -11,11 +11,12 @@ const only = process.argv.includes('--set') ? process.argv[process.argv.indexOf(
 /** The country whose brands an app in this language would load by default. */
 const COUNTRY: Record<string, string> = {
   en: 'GB', de: 'DE', fr: 'FR', es: 'ES', it: 'IT', pt: 'PT', nl: 'NL', pl: 'PL', sv: 'SE', ru: 'RU', uk: 'UA',
-  el: 'GR', tr: 'TR', ar: 'SA', hi: 'IN', ja: 'JP', zh: 'CN', ko: 'KR', th: 'TH',
+  el: 'GR', fi: 'FI', tr: 'TR', ar: 'SA', hi: 'IN', ja: 'JP', zh: 'CN', ko: 'KR', th: 'TH',
 }
 
 type Case = [lang: string, title: string, expect: string | string[] | null, note?: string, country?: string]
-interface Set { name: string; categories: Category[]; cases: Case[] }
+/** Categories are one list, or one per language when they are described in the title's language. */
+interface Set { name: string; categories: Category[] | Record<string, Category[]>; cases: Case[] }
 
 const chunkCache = new Map<string, Chunk>()
 async function chunk(path: string): Promise<Chunk> {
@@ -46,7 +47,7 @@ async function runSet(set: Set, label: string) {
   for (const [lang, title, expect, note, country] of set.cases) {
     const region = country ?? COUNTRY[lang]
     const key = `${lang}|${region}`
-    if (!cache.has(key)) cache.set(key, await classifier(set.categories, [lang, 'en'], ['001', region]))
+    if (!cache.has(key)) cache.set(key, await classifier(Array.isArray(set.categories) ? set.categories : set.categories[lang], [lang, 'en'], ['001', region]))
     const got = cache.get(key)!.suggest(title)
     const first = cache.get(key)!.rank(title)[0]
     const ok = expect === null ? got === null : got !== null && [expect].flat().includes(got.id)
@@ -88,13 +89,13 @@ async function runHistory() {
 }
 
 const runs = []
-for (const name of ['expenses', 'todo', 'inventory']) {
+for (const name of ['expenses', 'todo', 'inventory', 'wordforms']) {
   if (only && only !== name) continue
   const set: Set = JSON.parse(readFileSync(root + `eval/sets/${name}.json`, 'utf8'))
   runs.push(await runSet(set, name))
   if (name === 'expenses') {
     // Same titles when the app gives emoji only, no words.
-    runs.push(await runSet({ ...set, categories: set.categories.map(({ id, emoji }) => ({ id, emoji })) }, 'expenses (emoji only)'))
+    runs.push(await runSet({ ...set, categories: (set.categories as Category[]).map(({ id, emoji }) => ({ id, emoji })) }, 'expenses (emoji only)'))
   }
 }
 const history = only ? null : await runHistory()
