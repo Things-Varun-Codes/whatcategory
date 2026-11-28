@@ -1,6 +1,6 @@
 {
   "name": "whatcategory",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Suggest which of your app's categories fits a short title, in any language. Offline: no LLM, no network, no API key. Built from open data (Unicode CLDR, OpenStreetMap name-suggestion-index and iD presets).",
   "keywords": [
     "category",
