@@ -60,6 +60,40 @@ describe('reported wrong suggestions', () => {
     expect(c.suggest('Shell petrol')?.id).toBe('fuel')
     expect(c.suggest('Groceries')?.id).toBe('groceries')
   })
+  it("takes other forms of a category's word, in any language, but not lookalikes", async () => {
+    const categories = [...expenses, { id: 'trains', emoji: '🚆', words: ['Train'] }]
+    const c = createClassifier({ categories, data: await loadData({ locales: ['en-GB', 'en'], regions: ['GB'] }) })
+    // "train" is not "trail": a fitness trail's "gym" suggested trains.
+    for (const title of ['Gym membership', 'Hiking trail', 'Trailer hire']) expect(c.suggest(title)?.id).not.toBe('trains')
+    expect(c.suggest('Train to Leeds')?.id).toBe('trains')
+    expect(c.suggest('Trains')?.id).toBe('trains')
+    // A past title is not a lookalike's either.
+    const history = [{ title: 'Train to Leeds', categoryId: 'trains' }]
+    expect(c.suggest('Hiking trail', history)?.id).not.toBe('trains')
+    expect(c.suggest('Trains to York', history)?.id).toBe('trains')
+
+    // Which endings join forms of one word is learned per locale, so plurals that change the ending count too.
+    const one = async (locale: string, word: string) =>
+      createClassifier({ categories: [{ id: 'it', words: [word] }, { id: 'other', emoji: '🎈' }], data: await loadData({ locales: [locale, 'en'] }) })
+    expect((await one('it', 'Pizza')).suggest('Due pizze')?.id).toBe('it')
+    expect((await one('ru', 'Машина')).suggest('Машины')?.id).toBe('it')
+    expect((await one('fr', 'Cheval')).suggest('Chevaux')?.id).toBe('it')
+    expect((await one('pt', 'Hotel')).suggest('Hotéis')?.id).toBe('it')
+    expect((await one('tr', 'Kitap')).suggest('Kitaplar')?.id).toBe('it')
+    expect((await one('fr', 'Train')).suggest('Traiteur')).toBeNull()
+    expect((await one('en', 'Cards')).suggest('Cardigan')).toBeNull()
+    expect((await one('en', 'Shopping')).suggest('Shop')?.id).toBe('it')
+    // A locale with no endings to learn from (Japanese has no inflected Latin words) does not block English ones.
+    const ja = createClassifier({ categories: [{ id: 'it', words: ['Books'] }, { id: 'other', emoji: '🎈' }], data: await loadData({ locales: ['ja'] }) })
+    expect(ja.suggest('book')?.id).toBe('it')
+  })
+  it('learns word endings from each locale, with no language rules', async () => {
+    const endings = async (locale: string) => (await loadData({ locales: [locale] })).flatMap((c) => (c.kind === 'words' ? (c.endings ?? []) : []))
+    expect(await endings('en')).toEqual(expect.arrayContaining(['~s', 'ies~y', '~+ing']))
+    expect(await endings('en')).not.toContain('l~n')
+    expect(await endings('it')).toEqual(expect.arrayContaining(['a~e', 'i~o']))
+    expect(await endings('ru')).toContain('а~ы')
+  })
 })
 
 describe('README example', () => {

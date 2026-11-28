@@ -1,6 +1,6 @@
 import type { Chunk, BrandsChunk } from './data.ts'
 import { tokens, nameKey, emojiKey, wordMatch, fold } from './text.ts'
-import { prepareLocale, tokenEvidence, inflections, entryWeight, isNumberForm, type Locale } from './words.ts'
+import { prepareLocale, tokenEvidence, inflections, entryWeight, isNumberForm, sameForm, type Locale } from './words.ts'
 
 export type { Chunk, WordsChunk, BrandsChunk } from './data.ts'
 export { tokens, fold } from './text.ts'
@@ -90,6 +90,9 @@ export function createClassifier(options: Options): Classifier {
   // Every word a category is described by, 0..1: its own words fully, and the words of its anchor concepts
   // (its emoji, and concepts its words name or describe) as strongly as the anchor. A vague word
   // such as "out" in "Eating out" names hundreds of concepts, so it anchors each of them only weakly.
+  const knows = (loc: Locale, w: string) => Object.hasOwn(loc.chunk.index, w)
+  /** The other forms of a word among a locale's words, not every word that starts the same way. */
+  const forms = (w: string, loc: Locale) => inflections(w, loc).filter(([k]) => sameForm(w, k, loc))
   const categories = options.categories.map((cat) => {
     const words = (cat.words ?? []).flatMap(tokens)
     const anchors = new Map<string, number>()
@@ -97,7 +100,7 @@ export function createClassifier(options: Options): Classifier {
     if (cat.emoji) anchor(emojiKey(cat.emoji), 1)
     for (const w of words)
       for (const loc of locales)
-        for (const [k, q] of [[w, 1] as [string, number], ...inflections(w, loc)])
+        for (const [k, q] of [[w, 1] as [string, number], ...forms(w, loc)])
           for (const p of Object.hasOwn(loc.chunk.index, k) ? loc.chunk.index[k] : [])
             anchor(loc.concepts[p >> 2], q * loc.spec.get(k)! * entryWeight(p))
     const described = new Map<string, number>()
@@ -108,7 +111,7 @@ export function createClassifier(options: Options): Classifier {
     // only singular and plural: a shared start would link ✈️ "plane" to "plants".
     const own = new Set(words)
     for (const [w, s] of [...described])
-      for (const loc of locales) for (const [k, q] of inflections(w, loc)) if (own.has(w) || isNumberForm(w, k)) put(k, s * q)
+      for (const loc of locales) for (const [k, q] of inflections(w, loc)) if (own.has(w) ? sameForm(w, k, loc) : isNumberForm(w, k)) put(k, s * q)
     return { id: cat.id, words, anchors, described }
   })
 
@@ -134,6 +137,21 @@ export function createClassifier(options: Options): Classifier {
     })
     simCache.set(concept, links)
     return links
+  }
+
+  /**
+   * How well two words from outside the data (a title, a category's words, a past title) match: 1 if equal, less
+   * for forms of one word, 0 for lookalikes. The locales that know both words decide, else those that know either.
+   * When none knows either, or `lenient` and none knows both, there is only the shape to go by.
+   */
+  function formMatch(a: string, b: string, lenient = false): number {
+    if (a === b) return 1
+    const q = wordMatch(a, b)
+    if (!q) return 0
+    const both = locales.filter((l) => knows(l, a) && knows(l, b))
+    const either = lenient ? [] : locales.filter((l) => knows(l, a) || knows(l, b))
+    const judges = both.length ? both : either
+    return !judges.length || judges.some((l) => sameForm(a, b, l)) ? q : 0
   }
 
   const isWord = (key: string) => locales.some((l) => Object.hasOwn(l.chunk.index, key))
@@ -183,7 +201,7 @@ export function createClassifier(options: Options): Classifier {
       const t = toks[i++]
       const direct = new Map<string, number>()
       categories.forEach((cat) => {
-        const q = Math.max(0, ...cat.words.map((w) => wordMatch(t, w)))
+        const q = Math.max(0, ...cat.words.map((w) => formMatch(t, w)))
         if (q) direct.set(cat.id, q)
       })
       const ev = tokenEvidence(t, locales)
@@ -260,7 +278,7 @@ export function createClassifier(options: Options): Classifier {
     history.forEach((h) => {
       const theirs = tokens(h.title)
       let shared = 0
-      for (const t of mine) shared += Math.max(0, ...theirs.map((o) => wordMatch(t, o)))
+      for (const t of mine) shared += Math.max(0, ...theirs.map((o) => formMatch(t, o, true)))
       const s = (HISTORY_SIMILAR_WEIGHT * shared) / Math.max(mine.size, theirs.length)
       const prev = best.get(h.categoryId)
       if (s > 0 && (!prev || s >= prev.confidence))

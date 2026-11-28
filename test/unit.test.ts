@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createClassifier, createEmojiFinder, learn, tokens, type WordsChunk, type BrandsChunk } from '../src/index.ts'
-import { nameKey, wordMatch } from '../src/text.ts'
+import { nameKey, wordMatch, endingPair } from '../src/text.ts'
 import { isNumberForm } from '../src/words.ts'
 
 // Tiny hand-made chunks so the scoring rules can be tested without the generated data.
@@ -38,6 +38,14 @@ describe('text', () => {
     expect(wordMatch('super', 'supermarket')).toBe(0)
     expect(wordMatch('bus', 'bush')).toBe(0)
   })
+  it('names the endings two words differ by', () => {
+    expect(endingPair('pizza', 'pizze')).toBe('a~e')
+    expect(endingPair('trains', 'train')).toBe('~s')
+    expect(endingPair('grocery', 'groceries')).toBe('ies~y')
+    // A doubled letter before the ending is the same ending, whatever the letter.
+    expect(endingPair('shop', 'shopping')).toBe('~+ing')
+    expect(endingPair('swimming', 'swim')).toBe('~+ing')
+  })
   it('tells singular and plural from lookalikes', () => {
     for (const [a, b] of [['vegetables', 'vegetable'], ['grocery', 'groceries'], ['cerveza', 'cervezas']]) expect(isNumberForm(a, b)).toBe(true)
     for (const [a, b] of [['plane', 'plants'], ['petrol', 'petri'], ['chai', 'chair'], ['hotell', 'hotellnatt']]) expect(isNumberForm(a, b)).toBe(false)
@@ -45,6 +53,27 @@ describe('text', () => {
 })
 
 describe('classifier', () => {
+  it("matches a category's word in the forms its locale backs", () => {
+    // This locale knows "train" and "trail" as words for different things, and that "~s" joins forms of one word.
+    const chunk: WordsChunk = { ...words, index: { ...words.index, train: [9], trail: [17] }, endings: ['~s'] }
+    const cats = [{ id: 'trains', words: ['train'] }, { id: 'drinks', emoji: '🍺' }]
+    const backed = createClassifier({ categories: cats, data: [chunk] })
+    expect(backed.suggest('trains')?.id).toBe('trains')
+    expect(backed.suggest('trail')).toBeNull()
+    // Words that no loaded locale knows are judged by their shape, not by another language's endings.
+    const foreign = createClassifier({ categories: [{ id: 'bills', words: ['rechnung'] }, { id: 'drinks', emoji: '🍺' }], data: [chunk] })
+    expect(foreign.suggest('rechnungen')?.id).toBe('bills')
+    // With no endings learned, or no words loaded at all, there is only the shape to go by.
+    expect(createClassifier({ categories: cats, data: [{ ...chunk, endings: [] }] }).suggest('trail')?.id).toBe('trains')
+    expect(createClassifier({ categories: cats, data: [] }).suggest('trains')?.id).toBe('trains')
+  })
+  it('keeps a past title from a lookalike only when the data knows both words apart', () => {
+    const chunk: WordsChunk = { ...words, index: { ...words.index, train: [9], trail: [17] }, endings: ['~s'] }
+    const h = createClassifier({ categories: [{ id: 'a', emoji: '🍷' }, { id: 'b', emoji: '🍽' }], data: [chunk] })
+    expect(h.suggest('zorku', [{ title: 'zorka', categoryId: 'b' }])?.id).toBe('b')
+    expect(h.suggest('trains', [{ title: 'train', categoryId: 'b' }])?.id).toBe('b')
+    expect(h.suggest('trail', [{ title: 'train', categoryId: 'b' }])?.id).not.toBe('b')
+  })
   it("suggests a category through the category's emoji", () => {
     expect(c.suggest('Beer')?.id).toBe('drinks')
     expect(c.suggest('Taxi')?.id).toBe('transport')

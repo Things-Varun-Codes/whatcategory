@@ -5,7 +5,7 @@
 // Run: node scripts/build-data.ts
 import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { tokens, nameKey, emojiKey } from '../src/text.ts'
+import { tokens, nameKey, emojiKey, wordMatch, endingPair } from '../src/text.ts'
 import type { WordsChunk, BrandsChunk } from '../src/data.ts'
 
 const require = createRequire(import.meta.url)
@@ -126,7 +126,34 @@ function buildWords(locale: string): WordsChunk {
   }
   const sorted: Record<string, number[]> = {}
   for (const k of Object.keys(index).sort()) sorted[k] = index[k]
-  return { kind: 'words', locale, concepts, index: sorted }
+  return { kind: 'words', locale, concepts, index: sorted, endings: learnEndings(sorted) }
+}
+
+/** An ending pair counts when at least this many word pairs with it describe a common concept... */
+const ENDING_MIN_PAIRS = 3
+/** ...and they are at least this share of all word pairs with it. English "l~n" (train/trail) is 0 of 3, "~s" 114 of 288. */
+const ENDING_MIN_SHARE = 0.25
+
+/**
+ * The ending pairs that join forms of one word in a locale, learned from its own index: among all pairs of
+ * words that start the same ("pizza"/"pizze", "train"/"trail"), the endings whose pairs often describe a common
+ * concept. No language rules: Italian yields "a~e" and "i~o", English "~s" and "ies~y", Turkish "~lar".
+ */
+function learnEndings(index: Record<string, number[]>): string[] {
+  const byStart = new Map<string, string[]>()
+  for (const k of Object.keys(index)) if (k.length >= 4) (byStart.get(k.slice(0, 4)) ?? byStart.set(k.slice(0, 4), []).get(k.slice(0, 4))!).push(k)
+  const seen = new Map<string, [shared: number, all: number]>()
+  for (const group of byStart.values())
+    for (let i = 0; i < group.length; i++)
+      for (let j = i + 1; j < group.length; j++) {
+        if (!wordMatch(group[i], group[j])) continue
+        const pair = endingPair(group[i], group[j])
+        const count = seen.get(pair) ?? seen.set(pair, [0, 0]).get(pair)!
+        const concepts = new Set(index[group[i]].map((p) => p >> 2))
+        if (index[group[j]].some((p) => concepts.has(p >> 2))) count[0]++
+        count[1]++
+      }
+  return [...seen].filter(([, [shared, all]]) => shared >= ENDING_MIN_PAIRS && shared >= ENDING_MIN_SHARE * all).map(([pair]) => pair).sort()
 }
 
 // ---- NSI brands -----------------------------------------------------------------

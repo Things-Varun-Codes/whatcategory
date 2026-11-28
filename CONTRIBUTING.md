@@ -28,7 +28,7 @@ npm test
 
 ## Measuring a change
 
-Accuracy is measured, not argued about. `eval/sets/` holds hand-labelled titles in 19 languages,
+Accuracy is measured, not argued about. `eval/sets/` holds hand-labelled titles in 20 languages,
 including titles that should get no suggestion.
 
 ```sh

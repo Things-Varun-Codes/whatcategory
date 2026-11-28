@@ -11,6 +11,11 @@ export interface WordsChunk {
   concepts: string[]
   /** token → packed entries: conceptIndex * 4 + flags (1 = keyword or search term, not the name; 2 = never a whole name or keyword in this locale, like "and"). */
   index: Record<string, number[]>
+  /**
+   * Ending pairs that join forms of one word in this locale ("~s", "ies~y", "a~e"), learned from the index:
+   * pairs of words with these endings often describe the same concept. See `endingPair`.
+   */
+  endings?: string[]
 }
 
 /** Brand, operator and transit-network names for one country, from the OSM name-suggestion-index. */

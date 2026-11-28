@@ -6,6 +6,33 @@ All notable changes to this project are listed here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- A category's word no longer stands for a different word that starts the same way. A category described by
+  "Train" was also taken to mean "trail" and "trailer", so "Gym membership" (a fitness trail) and "Hiking
+  trail" suggested trains. The same applies to a title word matched against a category's word.
+- A past title no longer matches a new title through two words the data knows as different words: after
+  "Train to Leeds", "Hiking trail" is not suggested trains.
+- Forms of a category's word that change the ending are recognised in more languages: Italian "pizze" for
+  Pizza, Russian "машины" for Машина, French "chevaux" for Cheval.
+
+### Changed
+
+- Each words chunk has a new `endings` list: the ending pairs that join forms of one word in that locale
+  ("~s", "ies~y", "a~e", and "~+ing" for a doubled letter as in "shopping"), learned from the locale's own
+  words when the data is built. Two words that start the same count as forms of a category's word only when
+  their endings are in that list. A locale that knows neither word has no say, and a locale with no list
+  goes by the shape as before.
+- The evaluation has a "word forms" set: 97 titles in 12 languages against categories described in the title's
+  language, 36 of them lookalikes that should get no suggestion.
+
+### Known limitations
+
+- A lookalike whose ending is also a real ending in its language still matches ("booking" for Books), as can a
+  title word the data doesn't know ("tablet" for Table). Rare and irregular forms are missed ("Züge" for Zug).
+- A title word's own forms, and the words of a category's emoji, are still joined by the singular and plural
+  shape only, so an emoji-only category does not gain the new forms.
+
 ## [0.1.2]
 
 ### Fixed

@@ -1,0 +1,95 @@
+{
+  "name": "wordforms",
+  "description": "Categories described by one word each, in the title's own language and with no emoji. Titles use another form of a category's word (plural, case) and should reach it, or a different word that only starts the same way and should get no suggestion.",
+  "categories": {
+    "en": [
+      { "id": "trains", "words": ["Train"] }, { "id": "furniture", "words": ["Table"] }, { "id": "cards", "words": ["Cards"] },
+      { "id": "plans", "words": ["Plans"] }, { "id": "dairy", "words": ["Butter"] }, { "id": "classes", "words": ["Classes"] },
+      { "id": "books", "words": ["Books"] }, { "id": "gifts", "words": ["Gifts"] }, { "id": "bills", "words": ["Bills"] },
+      { "id": "repairs", "words": ["Repairs"] }, { "id": "hobbies", "words": ["Hobby"] }, { "id": "subscriptions", "words": ["Subscriptions"] },
+      { "id": "shopping", "words": ["Shopping"] }
+    ],
+    "it": [
+      { "id": "pizza", "words": ["Pizza"] }, { "id": "bambini", "words": ["Bambino"] }, { "id": "treni", "words": ["Treno"] },
+      { "id": "libri", "words": ["Libro"] }, { "id": "regali", "words": ["Regalo"] }, { "id": "posta", "words": ["Posta"] }, { "id": "casa", "words": ["Casa"] }
+    ],
+    "ru": [
+      { "id": "car", "words": ["Машина"] }, { "id": "flat", "words": ["Квартира"] }, { "id": "groceries", "words": ["Продукты"] },
+      { "id": "toys", "words": ["Игрушка"] }, { "id": "books", "words": ["Книга"] }, { "id": "bank", "words": ["Банк"] },
+      { "id": "clothes", "words": ["Одежда"] }
+    ],
+    "fr": [
+      { "id": "cheval", "words": ["Cheval"] }, { "id": "train", "words": ["Train"] }, { "id": "sante", "words": ["Santé"] },
+      { "id": "cadeaux", "words": ["Cadeau"] }, { "id": "port", "words": ["Port"] }, { "id": "poisson", "words": ["Poisson"] },
+      { "id": "voyages", "words": ["Voyages"] }
+    ],
+    "es": [
+      { "id": "carro", "words": ["Carro"] }, { "id": "regalos", "words": ["Regalo"] }, { "id": "cerveza", "words": ["Cerveza"] },
+      { "id": "casa", "words": ["Casa"] }, { "id": "puerta", "words": ["Puerta"] }, { "id": "libros", "words": ["Libro"] }
+    ],
+    "de": [
+      { "id": "flug", "words": ["Flug"] }, { "id": "rechnung", "words": ["Rechnung"] }, { "id": "zug", "words": ["Zug"] },
+      { "id": "buch", "words": ["Buch"] }, { "id": "haus", "words": ["Haus"] }, { "id": "apotheke", "words": ["Apotheke"] }
+    ],
+    "pt": [
+      { "id": "hotel", "words": ["Hotel"] }, { "id": "pao", "words": ["Pão"] }, { "id": "viagem", "words": ["Viagem"] },
+      { "id": "carro", "words": ["Carro"] }, { "id": "porta", "words": ["Porta"] }
+    ],
+    "pl": [
+      { "id": "zabawki", "words": ["Zabawka"] }, { "id": "chleb", "words": ["Chleb"] }, { "id": "ksiazki", "words": ["Książka"] }
+    ],
+    "tr": [
+      { "id": "kitap", "words": ["Kitap"] }, { "id": "ekmek", "words": ["Ekmek"] }, { "id": "fatura", "words": ["Fatura"] }, { "id": "kart", "words": ["Kart"] }
+    ],
+    "el": [
+      { "id": "books", "words": ["Βιβλίο"] }, { "id": "gifts", "words": ["Δώρο"] }, { "id": "taxi", "words": ["Ταξί"] }
+    ],
+    "nl": [
+      { "id": "boek", "words": ["Boek"] }, { "id": "trein", "words": ["Trein"] }, { "id": "kaart", "words": ["Kaart"] }
+    ],
+    "fi": [
+      { "id": "kirja", "words": ["Kirja"] }, { "id": "lahja", "words": ["Lahja"] }, { "id": "juna", "words": ["Juna"] }
+    ]
+  },
+  "cases": [
+    ["en", "Trains", "trains"], ["en", "Two tables", "furniture"], ["en", "Birthday card", "cards"], ["en", "Gift for mum", "gifts"],
+    ["en", "Phone bill", "bills"], ["en", "Bike repair", "repairs"], ["en", "Hobbies", "hobbies"], ["en", "Subscription", "subscriptions"],
+    ["en", "Book", "books"], ["en", "Class", "classes"], ["en", "Plan", "plans"], ["en", "Shop", "shopping"], ["en", "Subscribe", "subscriptions"],
+    ["en", "Hiking trail", null, "trail"], ["en", "Trailer hire", null], ["en", "Gym membership", null, "fitness trail"],
+    ["en", "Tablet", null], ["en", "Cardigan", null], ["en", "Cardio", null], ["en", "Plant", null], ["en", "Butterfly", null],
+    ["en", "Classic", null], ["en", "Booking", null], ["en", "Billiards", null], ["en", "New trainers", null, "shoes"], ["en", "Personal trainer", null],
+
+    ["it", "Due pizze", "pizza"], ["it", "Scarpe per i bambini", "bambini"], ["it", "Biglietti treni", "treni"], ["it", "Libri", "libri"],
+    ["it", "Regali di Natale", "regali"], ["it", "Case", "casa"],
+    ["it", "Trenta", null, "thirty"], ["it", "Posto auto", null, "parking space"], ["it", "Caso", null, "case, chance"], ["it", "Cassa", null, "till"],
+
+    ["ru", "Ремонт машины", "car"], ["ru", "За квартиру", "flat"], ["ru", "Продуктов на неделю", "groceries"], ["ru", "Игрушки", "toys"], ["ru", "Книги", "books"], ["ru", "Одежду", "clothes"],
+    ["ru", "Банка варенья", null, "jar of jam"],
+
+    ["fr", "Chevaux", "cheval"], ["fr", "Cadeaux de Noël", "cadeaux"], ["fr", "Trains", "train"], ["fr", "Poissons", "poisson"], ["fr", "Voyager", "voyages"],
+    ["fr", "Traiteur", null, "caterer"], ["fr", "Santon", null, "figurine"], ["fr", "Porte", null, "door"], ["fr", "Poison", null],
+
+    ["es", "Cervezas", "cerveza"], ["es", "Regalos de Navidad", "regalos"], ["es", "Libros", "libros"], ["es", "Carros", "carro"], ["es", "Casas", "casa"],
+    ["es", "Carrera", null, "race, degree"], ["es", "Regaliz", null, "liquorice"], ["es", "Puerto", null, "port"], ["es", "Caso", null], ["es", "Libra", null, "pound"],
+
+    ["de", "Flüge", "flug"], ["de", "Rechnungen", "rechnung"], ["de", "Züge", "zug"], ["de", "Bücher", "buch"], ["de", "Häuser", "haus"], ["de", "Apotheken", "apotheke"],
+    ["de", "Flügel", null, "wing, grand piano"], ["de", "Buche", null, "beech"], ["de", "Buchung", null, "booking"],
+
+    ["pt", "Hotéis", "hotel"], ["pt", "Pães", "pao"], ["pt", "Viagens", "viagem"], ["pt", "Carros", "carro"],
+    ["pt", "Porto", null, "port"],
+
+    ["pl", "Zabawki", "zabawki"], ["pl", "Dwa chleby", "chleb"], ["pl", "Książki", "ksiazki"],
+
+    ["tr", "Kitaplar", "kitap"], ["tr", "Kitabı", "kitap"], ["tr", "Ekmekler", "ekmek"], ["tr", "Faturası", "fatura"], ["tr", "Kartlar", "kart"],
+    ["tr", "Kartal", null, "eagle"],
+
+    ["el", "Βιβλία", "books"], ["el", "Δώρα", "gifts"],
+    ["el", "Ταξίδι", null, "trip"],
+
+    ["nl", "Boeken", "boek"], ["nl", "Treinen", "trein"], ["nl", "Kaarten", "kaart"],
+    ["nl", "Boeket", null, "bouquet"], ["nl", "Kaars", null, "candle"],
+
+    ["fi", "Kirjat", "kirja"], ["fi", "Lahjat", "lahja"], ["fi", "Junat", "juna"],
+    ["fi", "Kirje", null, "letter"]
+  ]
+}
