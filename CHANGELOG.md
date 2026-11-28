@@ -6,6 +6,8 @@ All notable changes to this project are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.3]
+
 ### Fixed
 
 - A category's word no longer stands for a different word that starts the same way. A category described by
